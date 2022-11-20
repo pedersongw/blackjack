@@ -4,12 +4,21 @@
   width: 100vw;
 }
 
-.dot {
+#dot {
   position: absolute;
   height: 5px;
   width: 5px;
   border-radius: 50%;
-  top: 200px;
-  left: 600px;
+  top: 50vh;
+  left: 50vw;
+  background-color: black;
+}
+
+.dot {
+  position: absolute;
+  background-image: url("../svg_playing_cards/backs/png_96_dpi/fish.png");
+  height: 333px;
+  width: 234px;
+
   background-color: black;
 }
