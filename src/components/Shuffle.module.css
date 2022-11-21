@@ -1,5 +1,6 @@
 .wrapper {
   position: relative;
+  overflow: hidden;
   height: 100vh;
   width: 100vw;
 }
@@ -9,16 +10,14 @@
   height: 5px;
   width: 5px;
   border-radius: 50%;
-  top: 50vh;
-  left: 50vw;
+  top: 30vh;
+  left: 30vw;
   background-color: black;
 }
 
 .dot {
   position: absolute;
-  background-image: url("../svg_playing_cards/backs/png_96_dpi/fish.png");
+
   height: 333px;
   width: 234px;
-
-  background-color: black;
 }

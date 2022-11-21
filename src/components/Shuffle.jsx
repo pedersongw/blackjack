@@ -2,40 +2,80 @@ import React, { useState, useEffect, useRef, createElement } from "react";
 import { useSprings, animated } from "@react-spring/web";
 import styles from "./Shuffle.module.css";
 
+import abstractClouds from "../svg_playing_cards/backs/png_96_dpi/abstract_clouds.png";
+import abstractScene from "../svg_playing_cards/backs/png_96_dpi/abstract_scene.png";
+import abstract from "../svg_playing_cards/backs/png_96_dpi/abstract.png";
+import astronaut from "../svg_playing_cards/backs/png_96_dpi/astronaut.png";
+import blue from "../svg_playing_cards/backs/png_96_dpi/blue.png";
+import blue2 from "../svg_playing_cards/backs/png_96_dpi/blue2.png";
+import cars from "../svg_playing_cards/backs/png_96_dpi/cars.png";
+import castle from "../svg_playing_cards/backs/png_96_dpi/castle.png";
+import fish from "../svg_playing_cards/backs/png_96_dpi/fish.png";
+import frog from "../svg_playing_cards/backs/png_96_dpi/frog.png";
+import red from "../svg_playing_cards/backs/png_96_dpi/red.png";
+import red2 from "../svg_playing_cards/backs/png_96_dpi/red2.png";
+
 const Shuffle = () => {
   const [hk, setHk] = useState({});
   const [coords, setCoords] = useState([]);
+  const [shuffling, setShuffling] = useState(false);
+  const [background, setBackground] = useState([
+    abstractClouds,
+    abstractScene,
+    abstract,
+    astronaut,
+    blue,
+    blue2,
+    cars,
+    castle,
+    fish,
+    frog,
+    red,
+    red2,
+  ]);
 
   const ref = useRef(null);
 
   useEffect(() => {
     let radius =
-      window.innerWidth < window.innerHeight
-        ? window.innerHeight
-        : window.innerWidth;
+      2 *
+      (window.innerWidth > window.innerHeight
+        ? window.innerWidth
+        : window.innerHeight);
     const { x: h, y: k } = ref.current.getBoundingClientRect();
-    let viewportAdjustedH = (h / window.innerWidth) * 100;
-    let viewportAdjustedK = (k / window.innerHeight) * 100;
 
-    setHk({ h: viewportAdjustedH, k: viewportAdjustedK });
+    setHk({ h: h, k: k });
 
-    let yDiff = radius + k - (k - radius);
+    // let yDiff = radius + k - (k - radius);
     let coords = [];
 
     for (let i = 0; i < 52; i++) {
-      let newY = Math.random() * yDiff + (k - radius);
-      let x = Math.sqrt(Math.pow(radius, 2) - Math.pow(newY - k, 2));
-      let newX =
-        Math.random() >= 0.5
-          ? ((x + h) / window.innerWidth) * 100
-          : ((-Math.abs(x) + h) / window.innerWidth) * 100;
-      let newYvH = (newY / window.innerHeight) * 100;
+      //   let newY = Math.random() * yDiff + (k - radius);
+      //   let x = Math.sqrt(Math.pow(radius, 2) - Math.pow(newY - k, 2));
+      //   let newX =
+      //     Math.random() >= 0.5
+      //       ? ((x + h) / window.innerWidth) * 100
+      //       : ((-Math.abs(x) + h) / window.innerWidth) * 100;
+      //   let newYvH = (newY / window.innerHeight) * 100;
 
-      coords.push([newX, newYvH]);
+      //   coords.push([newX, newYvH]);
+      let radians = ((Math.PI * 2) / 52) * (i + 1);
+
+      let newX = h + radius * Math.cos(radians);
+      let newY = k + radius * Math.sin(radians);
+      coords.push([newX, newY]);
     }
+
     console.log(coords);
     setCoords(coords);
   }, []);
+
+  const changeBackground = () => {
+    let bg = [...background];
+    bg.unshift(bg.pop());
+    console.log(bg);
+    setBackground(bg);
+  };
 
   const [springs, api] = useSprings(
     coords.length,
@@ -46,11 +86,41 @@ const Shuffle = () => {
   );
 
   const shuffleCenter = () => {
-    for (let i = coords.length; i > 0; i--) {
-      console.log(i);
+    setShuffling(true);
+
+    for (let i = 0; i < coords.length; i++) {
       setTimeout(() => {
-        api.current[i].start({ xy: [hk["h"], hk["k"]] });
-      }, i * 100);
+        if (i === 51) {
+          api.current[i].start({
+            xy: [hk["h"], hk["k"]],
+            onStart: () => {
+              setShuffling(false);
+            },
+          });
+        } else {
+          api.current[i].start({ xy: [hk["h"], hk["k"]] });
+        }
+      }, Math.pow(i, 2));
+    }
+  };
+
+  const shuffleOut = () => {
+    setShuffling(true);
+
+    for (let i = 51; i >= 0; i--) {
+      setTimeout(() => {
+        if (i === 0) {
+          api.current[i].start({
+            xy: [coords[i][0], coords[i][1]],
+            onRest: () => {
+              changeBackground();
+              setShuffling(false);
+            },
+          });
+        } else {
+          api.current[i].start({ xy: [coords[i][0], coords[i][1]] });
+        }
+      }, (51 - i) * 25);
     }
   };
 
@@ -63,12 +133,19 @@ const Shuffle = () => {
           key={index}
           style={{
             transform: springs[index].xy.to(
-              (x, y) => `translate3d(${x}vw, ${y}vh, 0)`
+              (x, y) => `translate3d(${x}px, ${y}px, 0)`
             ),
+            backgroundImage: `url(${background[0]})`,
           }}
         />
       ))}
-      <button onClick={() => shuffleCenter()}>Button</button>
+      <button onClick={() => shuffleCenter()} disabled={shuffling}>
+        Shuffle In
+      </button>
+
+      <button onClick={() => shuffleOut()} disabled={shuffling}>
+        Shuffle Out
+      </button>
     </div>
   );
 };
