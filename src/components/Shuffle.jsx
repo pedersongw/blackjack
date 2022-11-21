@@ -36,40 +36,6 @@ const Shuffle = () => {
 
   const ref = useRef(null);
 
-  useEffect(() => {
-    let radius =
-      2 *
-      (window.innerWidth > window.innerHeight
-        ? window.innerWidth
-        : window.innerHeight);
-    const { x: h, y: k } = ref.current.getBoundingClientRect();
-
-    setHk({ h: h, k: k });
-
-    // let yDiff = radius + k - (k - radius);
-    let coords = [];
-
-    for (let i = 0; i < 52; i++) {
-      //   let newY = Math.random() * yDiff + (k - radius);
-      //   let x = Math.sqrt(Math.pow(radius, 2) - Math.pow(newY - k, 2));
-      //   let newX =
-      //     Math.random() >= 0.5
-      //       ? ((x + h) / window.innerWidth) * 100
-      //       : ((-Math.abs(x) + h) / window.innerWidth) * 100;
-      //   let newYvH = (newY / window.innerHeight) * 100;
-
-      //   coords.push([newX, newYvH]);
-      let radians = ((Math.PI * 2) / 52) * (i + 1);
-
-      let newX = h + radius * Math.cos(radians);
-      let newY = k + radius * Math.sin(radians);
-      coords.push([newX, newY]);
-    }
-
-    console.log(coords);
-    setCoords(coords);
-  }, []);
-
   const changeBackground = () => {
     let bg = [...background];
     bg.unshift(bg.pop());
@@ -114,7 +80,7 @@ const Shuffle = () => {
             xy: [coords[i][0], coords[i][1]],
             onRest: () => {
               changeBackground();
-              setShuffling(false);
+              shuffleCenter();
             },
           });
         } else {
@@ -123,6 +89,46 @@ const Shuffle = () => {
       }, (51 - i) * 25);
     }
   };
+
+  useEffect(() => {
+    let radius =
+      2 *
+      (window.innerWidth > window.innerHeight
+        ? window.innerWidth
+        : window.innerHeight);
+    const { x: h, y: k } = ref.current.getBoundingClientRect();
+
+    setHk({ h: h, k: k });
+
+    // let yDiff = radius + k - (k - radius);
+    let coords = [];
+
+    for (let i = 0; i < 52; i++) {
+      //   let newY = Math.random() * yDiff + (k - radius);
+      //   let x = Math.sqrt(Math.pow(radius, 2) - Math.pow(newY - k, 2));
+      //   let newX =
+      //     Math.random() >= 0.5
+      //       ? ((x + h) / window.innerWidth) * 100
+      //       : ((-Math.abs(x) + h) / window.innerWidth) * 100;
+      //   let newYvH = (newY / window.innerHeight) * 100;
+
+      //   coords.push([newX, newYvH]);
+      let radians = ((Math.PI * 2) / 52) * (i + 1);
+
+      let newX = h + radius * Math.cos(radians);
+      let newY = k + radius * Math.sin(radians);
+      coords.push([newX, newY]);
+    }
+
+    console.log(coords);
+    setCoords(coords);
+  }, []);
+
+  useEffect(() => {
+    if (coords !== []) {
+      shuffleCenter();
+    }
+  }, [coords]);
 
   return (
     <div className={styles.wrapper}>
@@ -139,12 +145,9 @@ const Shuffle = () => {
           }}
         />
       ))}
-      <button onClick={() => shuffleCenter()} disabled={shuffling}>
-        Shuffle In
-      </button>
 
       <button onClick={() => shuffleOut()} disabled={shuffling}>
-        Shuffle Out
+        Shuffle
       </button>
     </div>
   );
