@@ -1,19 +1,8 @@
 .card {
-  position: relative;
-}
-
-.face {
   position: absolute;
-  top: 0;
-  left: 0;
-  height: 333px;
-  width: 234px;
+  z-index: 2;
 }
 
-#front {
-  background-image: url("../svg_playing_cards/other/png_96_dpi/hearts_ace_large_pip.png");
-}
-
-#back {
-  background-image: url("../svg_playing_cards/backs/png_96_dpi/frog.png");
+.button {
+  margin-left: 400px;
 }

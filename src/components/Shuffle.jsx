@@ -2,46 +2,12 @@ import React, { useState, useEffect, useRef, createElement } from "react";
 import { useSprings, animated } from "@react-spring/web";
 import styles from "./Shuffle.module.css";
 
-import abstractClouds from "../svg_playing_cards/backs/png_96_dpi/abstract_clouds.png";
-import abstractScene from "../svg_playing_cards/backs/png_96_dpi/abstract_scene.png";
-import abstract from "../svg_playing_cards/backs/png_96_dpi/abstract.png";
-import astronaut from "../svg_playing_cards/backs/png_96_dpi/astronaut.png";
-import blue from "../svg_playing_cards/backs/png_96_dpi/blue.png";
-import blue2 from "../svg_playing_cards/backs/png_96_dpi/blue2.png";
-import cars from "../svg_playing_cards/backs/png_96_dpi/cars.png";
-import castle from "../svg_playing_cards/backs/png_96_dpi/castle.png";
-import fish from "../svg_playing_cards/backs/png_96_dpi/fish.png";
-import frog from "../svg_playing_cards/backs/png_96_dpi/frog.png";
-import red from "../svg_playing_cards/backs/png_96_dpi/red.png";
-import red2 from "../svg_playing_cards/backs/png_96_dpi/red2.png";
-
-const Shuffle = () => {
+const Shuffle = (props) => {
   const [hk, setHk] = useState({});
   const [coords, setCoords] = useState([]);
   const [shuffling, setShuffling] = useState(false);
-  const [background, setBackground] = useState([
-    abstractClouds,
-    abstractScene,
-    abstract,
-    astronaut,
-    blue,
-    blue2,
-    cars,
-    castle,
-    fish,
-    frog,
-    red,
-    red2,
-  ]);
 
   const ref = useRef(null);
-
-  const changeBackground = () => {
-    let bg = [...background];
-    bg.unshift(bg.pop());
-    console.log(bg);
-    setBackground(bg);
-  };
 
   const [springs, api] = useSprings(
     coords.length,
@@ -62,9 +28,17 @@ const Shuffle = () => {
             onStart: () => {
               setShuffling(false);
             },
+            config: {
+              friction: 30,
+            },
           });
         } else {
-          api.current[i].start({ xy: [hk["h"], hk["k"]] });
+          api.current[i].start({
+            xy: [hk["h"], hk["k"]],
+            config: {
+              friction: 30,
+            },
+          });
         }
       }, Math.pow(i, 2));
     }
@@ -79,14 +53,18 @@ const Shuffle = () => {
           api.current[i].start({
             xy: [coords[i][0], coords[i][1]],
             onRest: () => {
-              changeBackground();
+              props.changeBackground();
               shuffleCenter();
             },
+            config: { friction: 100 },
           });
         } else {
-          api.current[i].start({ xy: [coords[i][0], coords[i][1]] });
+          api.current[i].start({
+            xy: [coords[i][0], coords[i][1]],
+            config: { friction: 100 },
+          });
         }
-      }, (51 - i) * 25);
+      }, Math.pow(51 - i, 2));
     }
   };
 
@@ -131,8 +109,12 @@ const Shuffle = () => {
   }, [coords]);
 
   return (
-    <div className={styles.wrapper}>
-      <div id={styles.dot} ref={ref}></div>
+    <React.Fragment>
+      <div
+        id={styles.dot}
+        ref={ref}
+        style={{ top: `${props.xy[1]}px`, left: `${props.xy[0]}px` }}
+      ></div>
       {springs.map((anim, index) => (
         <animated.div
           className={styles.dot}
@@ -141,7 +123,7 @@ const Shuffle = () => {
             transform: springs[index].xy.to(
               (x, y) => `translate3d(${x}px, ${y}px, 0)`
             ),
-            backgroundImage: `url(${background[0]})`,
+            backgroundImage: `url(${props.background})`,
           }}
         />
       ))}
@@ -149,7 +131,7 @@ const Shuffle = () => {
       <button onClick={() => shuffleOut()} disabled={shuffling}>
         Shuffle
       </button>
-    </div>
+    </React.Fragment>
   );
 };
 
