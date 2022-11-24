@@ -8,7 +8,7 @@ const Card = (props) => {
   const [cards, setCards] = useState([]);
   const [flipped, setFlipped] = useState(true);
   const spring = useSpring({
-    transform: `perspective(600px) scale(${flipped ? 1 : 0.5}) rotateX(${
+    transform: `perspective(600px) scale(${flipped ? 1 : 1.5}) rotateX(${
       flipped ? 180 : 0
     }deg)`,
   });

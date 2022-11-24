@@ -5,7 +5,6 @@ import styles from "./Shuffle.module.css";
 const Shuffle = (props) => {
   const [hk, setHk] = useState({});
   const [coords, setCoords] = useState([]);
-  const [shuffling, setShuffling] = useState(false);
 
   const ref = useRef(null);
 
@@ -17,56 +16,57 @@ const Shuffle = (props) => {
     []
   );
 
-  const shuffleCenter = () => {
-    setShuffling(true);
-
-    for (let i = 0; i < coords.length; i++) {
-      setTimeout(() => {
-        if (i === 51) {
-          api.current[i].start({
-            xy: [hk["h"], hk["k"]],
-            onStart: () => {
-              setShuffling(false);
-            },
-            config: {
-              friction: 30,
-            },
-          });
-        } else {
-          api.current[i].start({
-            xy: [hk["h"], hk["k"]],
-            config: {
-              friction: 30,
-            },
-          });
-        }
-      }, Math.pow(i, 2));
+  useEffect(() => {
+    if (props.shuffling[0] === "in" && props.shuffling[1]) {
+      for (let i = 0; i < coords.length; i++) {
+        setTimeout(() => {
+          if (i === 51) {
+            api.current[i].start({
+              xy: [hk["h"], hk["k"]],
+              onStart: () => {
+                props.setShuffling(["in", false]);
+              },
+              config: {
+                friction: 30,
+              },
+            });
+          } else {
+            api.current[i].start({
+              xy: [hk["h"], hk["k"]],
+              config: {
+                friction: 30,
+              },
+            });
+          }
+        }, Math.pow(i, 2));
+      }
+    } else if (props.shuffling[0] === "out" && props.shuffling[1]) {
+      for (let i = 51; i >= 0; i--) {
+        setTimeout(() => {
+          if (i === 0) {
+            api.current[i].start({
+              xy: [coords[i][0], coords[i][1]],
+              onStart: () => {
+                setTimeout(() => {
+                  props.changeBackground();
+                }, 350);
+              },
+              config: { friction: 100 },
+            });
+          } else {
+            api.current[i].start({
+              xy: [coords[i][0], coords[i][1]],
+              config: { friction: 100 },
+            });
+          }
+        }, Math.pow(51 - i, 2));
+      }
     }
-  };
+  }, [props.shuffling]);
 
-  const shuffleOut = () => {
-    setShuffling(true);
-
-    for (let i = 51; i >= 0; i--) {
-      setTimeout(() => {
-        if (i === 0) {
-          api.current[i].start({
-            xy: [coords[i][0], coords[i][1]],
-            onRest: () => {
-              props.changeBackground();
-              shuffleCenter();
-            },
-            config: { friction: 100 },
-          });
-        } else {
-          api.current[i].start({
-            xy: [coords[i][0], coords[i][1]],
-            config: { friction: 100 },
-          });
-        }
-      }, Math.pow(51 - i, 2));
-    }
-  };
+  useEffect(() => {
+    props.setShuffling(["in", true]);
+  }, [props.background]);
 
   useEffect(() => {
     let radius =
@@ -104,7 +104,7 @@ const Shuffle = (props) => {
 
   useEffect(() => {
     if (coords !== []) {
-      shuffleCenter();
+      props.setShuffling(["in", true]);
     }
   }, [coords]);
 
@@ -123,14 +123,10 @@ const Shuffle = (props) => {
             transform: springs[index].xy.to(
               (x, y) => `translate3d(${x}px, ${y}px, 0)`
             ),
-            backgroundImage: `url(${props.background})`,
+            backgroundImage: `url(${props.background[0]})`,
           }}
         />
       ))}
-
-      <button onClick={() => shuffleOut()} disabled={shuffling}>
-        Shuffle
-      </button>
     </React.Fragment>
   );
 };
