@@ -8,14 +8,19 @@ const Card = (props) => {
   const [cards, setCards] = useState([]);
   const [flipped, setFlipped] = useState(true);
   const spring = useSpring({
-    transform: `perspective(600px) scale(${flipped ? 1 : 1.5}) rotateX(${
-      flipped ? 180 : 0
-    }deg)`,
+    transform: `perspective(600px) rotateX(${flipped ? 180 : 0}deg)`,
   });
 
   useEffect(() => {
     setFlipped(!flipped);
   }, []);
+
+  useEffect(() => {
+    if (props.card === undefined) {
+      setFlipped(true);
+      console.log("not in array anymore", props.card);
+    }
+  }, [props.card]);
 
   return (
     <React.Fragment>
