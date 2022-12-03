@@ -3,9 +3,7 @@ import { useSprings, animated } from "@react-spring/web";
 import styles from "./Shuffle.module.css";
 
 const Shuffle = (props) => {
-  const [hk, setHk] = useState(null);
   const [coords, setCoords] = useState([]);
-  const [cardSize, setCardSize] = useState([0, 0]);
 
   const ref = useRef(null);
 
@@ -23,18 +21,23 @@ const Shuffle = (props) => {
         setTimeout(() => {
           if (i === 51) {
             api.current[i].start({
-              xy: [hk[0], hk[1]],
+              xy: [props.hk[0], props.hk[1]],
               onStart: () => {
                 props.setShuffling(["in", false]);
-                console.log("last card");
+                console.log("last card", props.hk);
               },
               config: {
                 friction: 30,
+                clamp: true,
               },
             });
           } else {
             api.current[i].start({
-              xy: [hk[0], hk[1]],
+              xy: [props.hk[0], props.hk[1]],
+              onStart: () => {
+                props.setShuffling(["in", false]);
+                console.log("card", props.hk);
+              },
               config: {
                 friction: 30,
               },
@@ -77,14 +80,20 @@ const Shuffle = (props) => {
   }, [coords]);
 
   useEffect(() => {
-    if (props.rect.height) {
-      let cardHeight = props.rect.height * 0.8;
-      let cardWidth = (cardHeight / 333) * 234;
-      setCardSize([cardWidth, cardHeight]);
+    if (coords !== []) {
+      props.setShuffling(["in", true]);
+    }
+    console.log(props.hk);
+  }, [props.hk]);
 
-      let h = props.rect.width / 2 - cardWidth / 2;
-      let k = props.rect.height * 0.1 + (window.innerHeight / 3) * 2;
-      setHk([h, k]);
+  useEffect(() => {
+    if (props.rect.height && props.cardSize) {
+      let h = Math.floor(props.rect.width / 2 - props.cardSize[0] / 2);
+      let k = Math.floor(
+        props.rect.height * 0.1 + (window.innerHeight / 3) * 2
+      );
+      console.log(props.rect.width, props.cardSize);
+      props.setHk([h, k]);
 
       let radius =
         2 *
@@ -118,7 +127,7 @@ const Shuffle = (props) => {
 
   return (
     <React.Fragment>
-      {hk &&
+      {props.hk &&
         springs.map((anim, index) => (
           <animated.div
             className={styles.card}
@@ -129,8 +138,8 @@ const Shuffle = (props) => {
               ),
               backgroundImage: `url(${props.background[0]})`,
               backgroundSize: "cover",
-              width: `${cardSize[0]}px`,
-              height: `${cardSize[1]}px`,
+              width: `${props.cardSize[0]}px`,
+              height: `${props.cardSize[1]}px`,
             }}
           />
         ))}

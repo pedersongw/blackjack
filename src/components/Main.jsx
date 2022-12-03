@@ -20,15 +20,14 @@ import red from "../svg_playing_cards/backs/png_96_dpi/red.png";
 import red2 from "../svg_playing_cards/backs/png_96_dpi/red2.png";
 
 const Main = () => {
-  const whereDot = () => {
-    return [window.innerWidth / 4, window.innerHeight / 3];
-  };
   const [windowSize, setWindowSize] = useState([0, 0]);
   const [cards, setCards] = useState([]);
   const [shuffling, setShuffling] = useState(["in", true]);
-  const [whereHand, setWhereHand] = useState([0, 0]);
+
+  const [hk, setHk] = useState([0, 0]);
+  const [cardSize, setCardSize] = useState([0, 0]);
+
   const [whereShuffle, setWhereShuffle] = useState({});
-  const [handDimensions, setHandDimensions] = useState([0, 0]);
 
   const handRef = useRef();
   const shuffleRef = useRef();
@@ -48,6 +47,10 @@ const Main = () => {
     red,
   ]);
 
+  useEffect(() => {
+    console.log(hk);
+  }, [hk]);
+
   const changeBackground = () => {
     let bg = [...background];
     bg.unshift(bg.pop());
@@ -63,6 +66,7 @@ const Main = () => {
 
   function setShuffle() {
     let shuffleRect = shuffleRef.current.getBoundingClientRect();
+    console.log(shuffleRect);
     setWhereShuffle(shuffleRect);
   }
 
@@ -72,30 +76,27 @@ const Main = () => {
     handleResize();
     setShuffle();
 
-    let rect = handRef.current.getBoundingClientRect();
-    const { right, left, top, bottom } = rect;
-    console.log(right - left, bottom - top);
-    const { x, y } = rect;
-    setWhereHand([x, y]);
-
     return () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
 
+  useEffect(() => {
+    console.log(whereShuffle);
+    let cardHeight = whereShuffle.height * 0.8;
+    let cardWidth = (cardHeight / 333) * 234;
+    setCardSize([cardWidth, cardHeight]);
+  }, [whereShuffle]);
+
   const transitions = useTransition(cards, {
     from: {
-      transform: `translate3d(${whereDot()[0]}px, ${
-        whereDot()[1]
-      }px, 0) scale(1)`,
+      transform: `translate3d(${hk[0]}px, ${hk[1]}px, 0) scale(1)`,
     },
     enter: {
-      transform: `translate3d(${whereHand[0]}px, ${whereHand[1]}px, 0) scale(0.5)`,
+      transform: `translate3d(50px, 0px, 0) scale(0.5)`,
     },
     leave: {
-      transform: `translate3d(${whereDot()[0]}px, ${
-        whereDot()[1]
-      }px, 0) scale(1)`,
+      transform: `translate3d(${hk[0]}px, ${hk[1]}px, 0) scale(1)`,
     },
   });
 
@@ -142,7 +143,7 @@ const Main = () => {
             })
           }
         >
-          button
+          deal card
         </button>
         <button className={styles.button} onClick={() => setCards([])}>
           Return All
@@ -162,41 +163,36 @@ const Main = () => {
         </button>
       </div>
 
-      <div className={styles.handWrapper} ref={handRef}>
-        <animated.div
-          className={styles.hand}
-          style={{
-            ...spring,
-            backfaceVisibility: "hidden",
-            rotateY: "180deg",
-            backgroundColor: "blue",
-          }}
-        ></animated.div>
-        <animated.div
-          className={styles.hand}
-          style={{
-            ...spring,
-            backfaceVisibility: "hidden",
-            backgroundColor: "yellow",
-          }}
-        >
-          <div className={styles.cardExample}></div>
-        </animated.div>
-      </div>
+      <animated.div
+        className={styles.handWrapper}
+        ref={handRef}
+        style={{
+          ...spring,
+
+          backgroundColor: "yellow",
+        }}
+      >
+        <div className={styles.hand}>
+          {transitions((anim, item, t, i) => (
+            <animated.div className={styles.card} style={anim}>
+              <Card
+                index={i}
+                card={cards[i]}
+                returnCard={returnCard}
+                background={background[0]}
+                changeBackground={changeBackground}
+              />
+            </animated.div>
+          ))}
+        </div>
+      </animated.div>
       <div className={styles.shuffleWrapper} ref={shuffleRef}>
-        {transitions((anim, item, t, i) => (
-          <animated.div className={styles.card} style={anim}>
-            <Card
-              index={i}
-              card={cards[i]}
-              returnCard={returnCard}
-              background={background[0]}
-              changeBackground={changeBackground}
-            />
-          </animated.div>
-        ))}
+        {hk[0] + "   " + hk[1]}
         <Shuffle
           rect={whereShuffle}
+          setHk={setHk}
+          hk={hk}
+          cardSize={cardSize}
           background={background}
           changeBackground={changeBackground}
           shuffling={shuffling}

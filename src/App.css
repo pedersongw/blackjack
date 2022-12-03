@@ -2,6 +2,7 @@ body,
 html {
   margin: 0;
   padding: 0;
+  background-color: rgb(64, 68, 87);
 }
 
 .App {

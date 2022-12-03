@@ -8,9 +8,9 @@
 }
 
 .handWrapper {
-  position: relative;
   height: 33%;
   width: 100%;
+  border: 3px solid black;
 }
 
 .shuffleWrapper {
@@ -24,12 +24,8 @@
 }
 
 .hand {
-  position: absolute;
-  top: 0;
-  left: 0;
   height: 100%;
   width: 100%;
-  border: 3px solid black;
 }
 
 .cardExample {
@@ -40,9 +36,10 @@
 
 .card {
   position: absolute;
-  z-index: 2;
+  top: 0;
+  left: 0;
 }
 
 .button {
-  height: 4vh;
+  height: auto;
 }
