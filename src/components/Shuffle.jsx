@@ -123,7 +123,7 @@ const Shuffle = (props) => {
 
       setCoords(coords);
     }
-  }, [props.rect.height]);
+  }, [props.rect]);
 
   return (
     <React.Fragment>

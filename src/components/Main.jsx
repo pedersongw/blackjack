@@ -60,33 +60,23 @@ const Main = () => {
 
   function handleResize() {
     setWindowSize([window.innerWidth, window.innerHeight]);
-    setShuffle();
-    console.log("resizing");
-  }
-
-  function setShuffle() {
     let shuffleRect = shuffleRef.current.getBoundingClientRect();
-    console.log(shuffleRect);
+    let cardHeight = shuffleRect.height * 0.8;
+    let cardWidth = (cardHeight / 333) * 234;
+    setCardSize([cardWidth, cardHeight]);
     setWhereShuffle(shuffleRect);
+    console.log("resizing");
   }
 
   useEffect(() => {
     window.addEventListener("resize", handleResize);
 
     handleResize();
-    setShuffle();
 
     return () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-
-  useEffect(() => {
-    console.log(whereShuffle);
-    let cardHeight = whereShuffle.height * 0.8;
-    let cardWidth = (cardHeight / 333) * 234;
-    setCardSize([cardWidth, cardHeight]);
-  }, [whereShuffle]);
 
   const transitions = useTransition(cards, {
     from: {
