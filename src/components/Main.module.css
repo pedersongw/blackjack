@@ -7,20 +7,24 @@
   width: 100%;
 }
 
-.handWrapper {
-  height: 33%;
-  width: 100%;
-  border: 3px solid black;
-}
-
-.shuffleWrapper {
-  height: 33%;
-  width: 100%;
-}
-
+.handWrapper,
+.shuffleWrapper,
 .buttonWrapper {
   height: 33%;
   width: 100%;
+}
+
+.handWrapper {
+  position: relative;
+}
+
+.handFlip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  border: 3px solid black;
 }
 
 .hand {
@@ -35,6 +39,10 @@
 }
 
 .card {
+  position: absolute;
+}
+
+.testCard {
   position: absolute;
   top: 0;
   left: 0;

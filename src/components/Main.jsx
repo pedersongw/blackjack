@@ -19,18 +19,26 @@ import frog from "../svg_playing_cards/backs/png_96_dpi/frog.png";
 import red from "../svg_playing_cards/backs/png_96_dpi/red.png";
 import red2 from "../svg_playing_cards/backs/png_96_dpi/red2.png";
 
+import face from "../svg_playing_cards/fronts/png_96_dpi/hearts_queen.png";
+
 const Main = () => {
   const [windowSize, setWindowSize] = useState([0, 0]);
+  const [cardSize, setCardSize] = useState([0, 0]);
+  const [testRect, setTestRect] = useState(null);
+  const [isTestCardVisible, setIsTestCardVisible] = useState(false);
+
   const [cards, setCards] = useState([]);
   const [shuffling, setShuffling] = useState(["in", true]);
 
   const [hk, setHk] = useState([0, 0]);
-  const [cardSize, setCardSize] = useState([0, 0]);
-
+  const [whereHand, setWhereHand] = useState(null);
   const [whereShuffle, setWhereShuffle] = useState({});
+
+  const wrapperRef = useRef();
 
   const handRef = useRef();
   const shuffleRef = useRef();
+  const testRef = useRef();
 
   const [background, setBackground] = useState([
     abstractClouds,
@@ -47,26 +55,30 @@ const Main = () => {
     red,
   ]);
 
-  useEffect(() => {
-    console.log(hk);
-  }, [hk]);
-
   const changeBackground = () => {
     let bg = [...background];
     bg.unshift(bg.pop());
-    console.log(bg);
+
     setBackground(bg);
   };
 
   function handleResize() {
     setWindowSize([window.innerWidth, window.innerHeight]);
     let shuffleRect = shuffleRef.current.getBoundingClientRect();
+    let handRect = handRef.current.getBoundingClientRect();
+    let testRect = testRef.current.getBoundingClientRect();
     let cardHeight = shuffleRect.height * 0.8;
     let cardWidth = (cardHeight / 333) * 234;
     setCardSize([cardWidth, cardHeight]);
+    setTestRect(testRect);
+    setWhereHand([handRect.x, handRect.y]);
     setWhereShuffle(shuffleRect);
     console.log("resizing");
   }
+
+  useEffect(() => {
+    console.log(testRect);
+  }, [testRect]);
 
   useEffect(() => {
     window.addEventListener("resize", handleResize);
@@ -80,15 +92,33 @@ const Main = () => {
 
   const transitions = useTransition(cards, {
     from: {
-      transform: `translate3d(${hk[0]}px, ${hk[1]}px, 0) scale(1)`,
+      transform: `translate3d(${whereHand ? hk[0] - whereHand[0] : 0}px, ${
+        whereHand ? hk[1] - whereHand[1] : 0
+      }px, 0)`,
     },
     enter: {
-      transform: `translate3d(50px, 0px, 0) scale(0.5)`,
+      transform: `translate3d(50px, 0px, 0)`,
     },
     leave: {
-      transform: `translate3d(${hk[0]}px, ${hk[1]}px, 0) scale(1)`,
+      transform: `translate3d(${whereHand ? hk[0] - whereHand[0] : 0}px, ${
+        whereHand ? hk[1] - whereHand[1] : 0
+      }px, 0)`,
     },
   });
+
+  const [spring, springApi] = useSpring(() => ({
+    from: {
+      transform: `perspective(600px) rotateX(0deg)`,
+    },
+    onRest: () => {
+      springApi.start({
+        to: {
+          transform: `perspective(600px) rotateX(0deg)`,
+        },
+        immediate: true,
+      });
+    },
+  }));
 
   const returnCard = (index) => {
     setCards((prevCards) => {
@@ -98,22 +128,8 @@ const Main = () => {
     });
   };
 
-  const [spring, springApi] = useSpring(() => ({
-    from: {
-      transform: `perspective(600px) rotateY(0deg)`,
-    },
-    onRest: () => {
-      springApi.start({
-        to: {
-          transform: `perspective(600px) rotateY(0deg)`,
-        },
-        immediate: true,
-      });
-    },
-  }));
-
   return (
-    <div className={styles.wrapper}>
+    <div className={styles.wrapper} ref={wrapperRef}>
       <div className={styles.buttonWrapper}>
         <button
           onClick={() => setShuffling(["out", true])}
@@ -142,46 +158,81 @@ const Main = () => {
           className={styles.button}
           onClick={() =>
             springApi.start({
-              from: { transform: `perspective(600px) rotateY(0deg)` },
+              from: { transform: `perspective(600px) rotateX(0deg)` },
               to: {
-                transform: `perspective(600px) rotateY(180deg)`,
+                transform: `perspective(600px) rotateX(180deg)`,
               },
             })
           }
         >
           flip
         </button>
+        <button
+          className={styles.button}
+          onClick={() => setIsTestCardVisible(!isTestCardVisible)}
+        >
+          Set Visibility Test Card
+        </button>
       </div>
 
-      <animated.div
-        className={styles.handWrapper}
-        ref={handRef}
-        style={{
-          ...spring,
+      <div className={styles.handWrapper}>
+        {" "}
+        <animated.div
+          className={styles.handFlip}
+          ref={handRef}
+          style={{
+            ...spring,
 
-          backgroundColor: "yellow",
-        }}
-      >
-        <div className={styles.hand}>
-          {transitions((anim, item, t, i) => (
-            <animated.div className={styles.card} style={anim}>
-              <Card
-                index={i}
-                card={cards[i]}
-                returnCard={returnCard}
-                background={background[0]}
-                changeBackground={changeBackground}
-              />
-            </animated.div>
-          ))}
-        </div>
-      </animated.div>
+            backgroundColor: "yellow",
+            backfaceVisibility: "hidden",
+          }}
+        >
+          <div className={styles.hand}>
+            {/* {whereHand &&
+            transitions((anim, item, t, i) => (
+              <animated.div className={styles.card} style={anim}>
+                <Card
+                  index={i}
+                  card={cards[i]}
+                  cardSize={cardSize}
+                  returnCard={returnCard}
+                  background={background[0]}
+                  face={face}
+                  changeBackground={changeBackground}
+                />
+              </animated.div>
+            ))} */}
+          </div>
+          <div
+            className={styles.testCard}
+            ref={testRef}
+            style={{
+              backgroundImage: `url(${abstractClouds})`,
+              backgroundSize: "cover",
+              width: `${cardSize[0]}px`,
+              height: `${cardSize[1]}px`,
+              visibility: isTestCardVisible ? "visible" : "hidden",
+            }}
+          ></div>
+        </animated.div>
+        <animated.div
+          className={styles.handFlip}
+          ref={handRef}
+          style={{
+            ...spring,
+            rotateX: "180deg",
+            backgroundColor: "yellow",
+            backfaceVisibility: "hidden",
+          }}
+        ></animated.div>
+      </div>
       <div className={styles.shuffleWrapper} ref={shuffleRef}>
-        {hk[0] + "   " + hk[1]}
         <Shuffle
           rect={whereShuffle}
+          windowSize={windowSize}
           setHk={setHk}
           hk={hk}
+          testRect={testRect}
           cardSize={cardSize}
           background={background}
           changeBackground={changeBackground}

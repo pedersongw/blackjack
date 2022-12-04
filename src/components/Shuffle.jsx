@@ -15,6 +15,27 @@ const Shuffle = (props) => {
     []
   );
 
+  const testMove = () => {
+    const { x, y } = props.testRect;
+    api.current[51].start({
+      xy: [x, y],
+      config: {
+        friction: 30,
+        clamp: true,
+      },
+    });
+  };
+
+  const testMoveBack = () => {
+    api.current[51].start({
+      xy: [props.hk[0], props.hk[1]],
+      config: {
+        friction: 30,
+        clamp: true,
+      },
+    });
+  };
+
   useEffect(() => {
     if (props.shuffling[0] === "in" && props.shuffling[1]) {
       for (let i = 0; i < coords.length; i++) {
@@ -36,7 +57,6 @@ const Shuffle = (props) => {
               xy: [props.hk[0], props.hk[1]],
               onStart: () => {
                 props.setShuffling(["in", false]);
-                console.log("card", props.hk);
               },
               config: {
                 friction: 30,
@@ -83,7 +103,6 @@ const Shuffle = (props) => {
     if (coords !== []) {
       props.setShuffling(["in", true]);
     }
-    console.log(props.hk);
   }, [props.hk]);
 
   useEffect(() => {
@@ -92,7 +111,7 @@ const Shuffle = (props) => {
       let k = Math.floor(
         props.rect.height * 0.1 + (window.innerHeight / 3) * 2
       );
-      console.log(props.rect.width, props.cardSize);
+
       props.setHk([h, k]);
 
       let radius =
@@ -143,6 +162,8 @@ const Shuffle = (props) => {
             }}
           />
         ))}
+      <button onClick={() => testMove()}>Test Move</button>
+      <button onClick={() => testMoveBack()}>Test Move Back</button>
     </React.Fragment>
   );
 };

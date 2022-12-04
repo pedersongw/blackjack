@@ -8,7 +8,7 @@ const Card = (props) => {
   const [cards, setCards] = useState([]);
   const [flipped, setFlipped] = useState(true);
   const spring = useSpring({
-    transform: `perspective(600px) rotateX(${flipped ? 180 : 0}deg)`,
+    transform: `perspective(600px) rotateX(${flipped ? 0 : 180}deg)`,
   });
 
   useEffect(() => {
@@ -35,6 +35,10 @@ const Card = (props) => {
         style={{
           ...spring,
           backfaceVisibility: "hidden",
+          backgroundSize: "cover",
+          backgroundImage: `url(${props.background})`,
+          width: `${props.cardSize[0]}px`,
+          height: `${props.cardSize[1]}px`,
         }}
       ></animated.div>
       <animated.div
@@ -48,7 +52,10 @@ const Card = (props) => {
           ...spring,
           backfaceVisibility: "hidden",
           rotateX: "180deg",
-          backgroundImage: `url(${props.background})`,
+          backgroundImage: `url(${props.face})`,
+          backgroundSize: "cover",
+          width: `${props.cardSize[0]}px`,
+          height: `${props.cardSize[1]}px`,
         }}
       ></animated.div>
     </React.Fragment>
