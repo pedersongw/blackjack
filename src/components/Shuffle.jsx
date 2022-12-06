@@ -16,7 +16,8 @@ const Shuffle = (props) => {
   );
 
   const testMove = () => {
-    const { x, y } = props.testRect;
+    let x = props.testXy[0];
+    let y = props.testXy[1];
     api.current[51].start({
       xy: [x, y],
       config: {
@@ -162,8 +163,12 @@ const Shuffle = (props) => {
             }}
           />
         ))}
-      <button onClick={() => testMove()}>Test Move</button>
-      <button onClick={() => testMoveBack()}>Test Move Back</button>
+      <button onClick={() => testMove()} disabled={!props.testXy}>
+        Test Move
+      </button>
+      <button onClick={() => testMoveBack()} disabled={!props.testXy}>
+        Test Move Back
+      </button>
     </React.Fragment>
   );
 };

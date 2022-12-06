@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useSpring, useTransition, animated } from "@react-spring/web";
+import { useSpring, animated } from "@react-spring/web";
 
 import Card from "./Card";
 import Shuffle from "./Shuffle";
@@ -24,14 +24,16 @@ import face from "../svg_playing_cards/fronts/png_96_dpi/hearts_queen.png";
 const Main = () => {
   const [windowSize, setWindowSize] = useState([0, 0]);
   const [cardSize, setCardSize] = useState([0, 0]);
-  const [testRect, setTestRect] = useState(null);
-  const [isTestCardVisible, setIsTestCardVisible] = useState(false);
+  const [whereHand, setWhereHand] = useState(null);
 
-  const [cards, setCards] = useState([]);
+  const [whereCardsShouldGo, setWhereCardsShouldGo] = useState(null);
+  const [testRect, setTestRect] = useState(null);
+
+  const [isTestCardVisiblie, setIsTestCardVisible] = useState(false);
+
   const [shuffling, setShuffling] = useState(["in", true]);
 
   const [hk, setHk] = useState([0, 0]);
-  const [whereHand, setWhereHand] = useState(null);
   const [whereShuffle, setWhereShuffle] = useState({});
 
   const wrapperRef = useRef();
@@ -39,6 +41,7 @@ const Main = () => {
   const handRef = useRef();
   const shuffleRef = useRef();
   const testRef = useRef();
+  const evenTestierRef = useRef();
 
   const [background, setBackground] = useState([
     abstractClouds,
@@ -62,23 +65,51 @@ const Main = () => {
     setBackground(bg);
   };
 
+  const calculateCardSize = () => {
+    let handRect = handRef.current.getBoundingClientRect();
+    setWhereHand(handRect);
+    console.log(handRect, window.innerWidth, window.innerHeight);
+    let availableHandHeight = handRect.height * 0.9;
+    let availableHandWidth = handRect.width * 0.9;
+    let cardHeight;
+    let cardWidth = (availableHandWidth / 8) * 3;
+    console.log(cardWidth);
+    if ((cardWidth / 234) * 333 > availableHandHeight) {
+      cardHeight = availableHandHeight;
+      cardWidth = (cardHeight / 333) * 234;
+    } else {
+      cardHeight = (cardWidth / 234) * 333;
+    }
+    setCardSize([cardWidth, cardHeight]);
+    console.log(cardWidth);
+
+    calculateWhereCardsShouldGo(handRect, cardWidth);
+  };
+
+  const calculateWhereCardsShouldGo = (whereHand, cardWidth) => {
+    let coords = [];
+    let x = whereHand.x + whereHand.width * 0.05;
+    let y = whereHand.y + whereHand.height * 0.05;
+    for (let i = 0; i < 6; i++) {
+      coords.push([x + cardWidth * (1 / 3) * i, y]);
+    }
+    setWhereCardsShouldGo(coords);
+    console.log(coords);
+    let style = window
+      .getComputedStyle(handRef.current)
+      .getPropertyValue("border-top-width");
+    console.log(style);
+  };
+
   function handleResize() {
     setWindowSize([window.innerWidth, window.innerHeight]);
     let shuffleRect = shuffleRef.current.getBoundingClientRect();
-    let handRect = handRef.current.getBoundingClientRect();
-    let testRect = testRef.current.getBoundingClientRect();
-    let cardHeight = shuffleRect.height * 0.8;
-    let cardWidth = (cardHeight / 333) * 234;
-    setCardSize([cardWidth, cardHeight]);
-    setTestRect(testRect);
-    setWhereHand([handRect.x, handRect.y]);
+
+    calculateCardSize();
+
     setWhereShuffle(shuffleRect);
     console.log("resizing");
   }
-
-  useEffect(() => {
-    console.log(testRect);
-  }, [testRect]);
 
   useEffect(() => {
     window.addEventListener("resize", handleResize);
@@ -89,22 +120,6 @@ const Main = () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-
-  const transitions = useTransition(cards, {
-    from: {
-      transform: `translate3d(${whereHand ? hk[0] - whereHand[0] : 0}px, ${
-        whereHand ? hk[1] - whereHand[1] : 0
-      }px, 0)`,
-    },
-    enter: {
-      transform: `translate3d(50px, 0px, 0)`,
-    },
-    leave: {
-      transform: `translate3d(${whereHand ? hk[0] - whereHand[0] : 0}px, ${
-        whereHand ? hk[1] - whereHand[1] : 0
-      }px, 0)`,
-    },
-  });
 
   const [spring, springApi] = useSpring(() => ({
     from: {
@@ -120,12 +135,14 @@ const Main = () => {
     },
   }));
 
-  const returnCard = (index) => {
-    setCards((prevCards) => {
-      let arr = [...cards];
-      arr.splice(index, 1);
-      return arr;
-    });
+  const produceTestRectXy = () => {
+    const { x, y } = testRef.current.getBoundingClientRect();
+    return [x, y];
+  };
+
+  const produceTestierRectXy = () => {
+    const { x, y } = evenTestierRef.current.getBoundingClientRect();
+    return [x, y];
   };
 
   return (
@@ -138,48 +155,41 @@ const Main = () => {
         >
           Shuffle
         </button>
+
         <button
           className={styles.button}
-          onClick={() =>
-            setCards((prevCards) => {
-              console.log("clicked");
-              let cards = [...prevCards];
-              cards.push([0, 0]);
-              return cards;
-            })
-          }
-        >
-          deal card
-        </button>
-        <button className={styles.button} onClick={() => setCards([])}>
-          Return All
-        </button>
-        <button
-          className={styles.button}
-          onClick={() =>
+          onClick={() => {
             springApi.start({
               from: { transform: `perspective(600px) rotateX(0deg)` },
               to: {
                 transform: `perspective(600px) rotateX(180deg)`,
               },
-            })
-          }
+            });
+          }}
         >
           flip
         </button>
         <button
           className={styles.button}
-          onClick={() => setIsTestCardVisible(!isTestCardVisible)}
+          onClick={() => {
+            setIsTestCardVisible(!isTestCardVisiblie);
+          }}
         >
-          Set Visibility Test Card
+          set visible
+        </button>
+        <button
+          className={styles.button}
+          onClick={() => {
+            console.log(testRef.current.getBoundingClientRect());
+          }}
+        >
+          log test ref
         </button>
       </div>
 
-      <div className={styles.handWrapper}>
-        {" "}
+      <div className={styles.handWrapper} ref={handRef}>
         <animated.div
           className={styles.handFlip}
-          ref={handRef}
           style={{
             ...spring,
 
@@ -187,37 +197,46 @@ const Main = () => {
             backfaceVisibility: "hidden",
           }}
         >
-          <div className={styles.hand}>
-            {/* {whereHand &&
-            transitions((anim, item, t, i) => (
-              <animated.div className={styles.card} style={anim}>
-                <Card
-                  index={i}
-                  card={cards[i]}
-                  cardSize={cardSize}
-                  returnCard={returnCard}
-                  background={background[0]}
-                  face={face}
-                  changeBackground={changeBackground}
-                />
-              </animated.div>
-            ))} */}
+          <div
+            className={styles.hand}
+            style={{
+              width: `${cardSize[0] * (1 + 2 / 3)}px`,
+              height: "90%",
+              marginLeft: whereHand ? `${whereHand.width * 0.05}px` : "0px",
+              marginTop: whereHand ? `${whereHand.height * 0.05}px` : "0px",
+            }}
+          >
+            <div className={styles.dot}></div>
+            <div className={styles.dot}></div>
+            <div className={styles.dot}></div>
+            <div className={styles.dot}></div>
+            <div className={styles.dot} ref={testRef}></div>
+            <div className={styles.dot}></div>
           </div>
           <div
-            className={styles.testCard}
-            ref={testRef}
+            ref={evenTestierRef}
             style={{
-              backgroundImage: `url(${abstractClouds})`,
-              backgroundSize: "cover",
+              position: "absolute",
               width: `${cardSize[0]}px`,
               height: `${cardSize[1]}px`,
-              visibility: isTestCardVisible ? "visible" : "hidden",
+              left: 0,
+              top: 0,
+              transform: `translate3d(${
+                testRef.current &&
+                testRef.current.getBoundingClientRect().x - whereHand.x
+              }px, ${
+                testRef.current &&
+                testRef.current.getBoundingClientRect().y - whereHand.y
+              }px, 0)`,
+              backgroundSize: "cover",
+              backgroundImage: `url(${abstractClouds})`,
+              visibility: isTestCardVisiblie ? "visible" : "hidden",
+              backfaceVisibility: "hidden",
             }}
           ></div>
         </animated.div>
         <animated.div
           className={styles.handFlip}
-          ref={handRef}
           style={{
             ...spring,
             rotateX: "180deg",
@@ -232,7 +251,7 @@ const Main = () => {
           windowSize={windowSize}
           setHk={setHk}
           hk={hk}
-          testRect={testRect}
+          testXy={evenTestierRef.current && produceTestierRectXy()}
           cardSize={cardSize}
           background={background}
           changeBackground={changeBackground}
