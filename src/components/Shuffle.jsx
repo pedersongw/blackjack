@@ -4,6 +4,8 @@ import styles from "./Shuffle.module.css";
 
 const Shuffle = (props) => {
   const [coords, setCoords] = useState([]);
+  const [lastCardMoved, setLastCardMoved] = useState(52);
+  const [zIndexes, setZIndexes] = useState([]);
 
   const ref = useRef(null);
 
@@ -145,6 +147,53 @@ const Shuffle = (props) => {
     }
   }, [props.rect]);
 
+  useEffect(() => {
+    const { dealerCardsDealt: cards, previousDealerCardsDealt: prevCards } =
+      props;
+    if (cards.length !== prevCards.length) {
+      let difference = cards.length - prevCards.length;
+      let startingIndex = cards.length - difference;
+      let newCards = cards.slice(-Math.abs(difference));
+      for (let i = 0; i < newCards.length; i++) {
+        setTimeout(() => {
+          let thisCard = lastCardMoved - 1;
+          setLastCardMoved(thisCard);
+          setZIndexes((prevIndexes) => {
+            let indexes = [...prevIndexes];
+            indexes[thisCard] = 51 - thisCard;
+            return indexes;
+          });
+          api.current[thisCard].start({
+            xy: [
+              props.dealerCardSlots[startingIndex + i].x,
+              props.dealerCardSlots[startingIndex + i].y,
+            ],
+            config: {
+              friction: 30,
+              clamp: true,
+            },
+            onRest: () => {
+              setZIndexes((prevIndexes) => {
+                let indexes = [...prevIndexes];
+                indexes[thisCard] = 0;
+                return indexes;
+              });
+              props.setDealerCardsDealt((prevCards) => {
+                let cards = [...prevCards];
+                cards[startingIndex + i][1] = true;
+                return cards;
+              });
+              api.current[thisCard].start({
+                xy: [coords[thisCard][0], coords[thisCard][1]],
+                immediate: true,
+              });
+            },
+          });
+        }, i * 100);
+      }
+    }
+  }, [props.dealerCardsDealt.length]);
+
   return (
     <React.Fragment>
       {props.hk &&
@@ -160,6 +209,7 @@ const Shuffle = (props) => {
               backgroundSize: "cover",
               width: `${props.cardSize[0]}px`,
               height: `${props.cardSize[1]}px`,
+              zIndex: zIndexes[index],
             }}
           />
         ))}

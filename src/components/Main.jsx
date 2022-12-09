@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useSpring, animated } from "@react-spring/web";
 
 import Card from "./Card";
+import Hand from "./Hand";
 import Shuffle from "./Shuffle";
 
 import styles from "./Main.module.css";
@@ -26,12 +27,17 @@ const Main = () => {
   const [cardSize, setCardSize] = useState([0, 0]);
   const [whereHand, setWhereHand] = useState(null);
 
-  const [whereCardsShouldGo, setWhereCardsShouldGo] = useState(null);
+  const [dealerCardsDealt, setDealerCardsDealt] = useState([]);
+  const [previousDealerCardsDealt, setPreviousDealerCardsDealt] = useState([]);
+
+  const [whereDealerCardSlots, setWhereDealerCardSlots] = useState(null);
+
   const [testRect, setTestRect] = useState(null);
 
   const [isTestCardVisiblie, setIsTestCardVisible] = useState(false);
 
   const [shuffling, setShuffling] = useState(["in", true]);
+  const [flipping, setFlipping] = useState(false);
 
   const [hk, setHk] = useState([0, 0]);
   const [whereShuffle, setWhereShuffle] = useState({});
@@ -68,7 +74,7 @@ const Main = () => {
   const calculateCardSize = () => {
     let handRect = handRef.current.getBoundingClientRect();
     setWhereHand(handRect);
-    console.log(handRect, window.innerWidth, window.innerHeight);
+
     let availableHandHeight = handRect.height * 0.9;
     let availableHandWidth = handRect.width * 0.9;
     let cardHeight;
@@ -81,24 +87,6 @@ const Main = () => {
       cardHeight = (cardWidth / 234) * 333;
     }
     setCardSize([cardWidth, cardHeight]);
-    console.log(cardWidth);
-
-    calculateWhereCardsShouldGo(handRect, cardWidth);
-  };
-
-  const calculateWhereCardsShouldGo = (whereHand, cardWidth) => {
-    let coords = [];
-    let x = whereHand.x + whereHand.width * 0.05;
-    let y = whereHand.y + whereHand.height * 0.05;
-    for (let i = 0; i < 6; i++) {
-      coords.push([x + cardWidth * (1 / 3) * i, y]);
-    }
-    setWhereCardsShouldGo(coords);
-    console.log(coords);
-    let style = window
-      .getComputedStyle(handRef.current)
-      .getPropertyValue("border-top-width");
-    console.log(style);
   };
 
   function handleResize() {
@@ -135,19 +123,85 @@ const Main = () => {
     },
   }));
 
-  const produceTestRectXy = () => {
-    const { x, y } = testRef.current.getBoundingClientRect();
-    return [x, y];
-  };
-
-  const produceTestierRectXy = () => {
-    const { x, y } = evenTestierRef.current.getBoundingClientRect();
-    return [x, y];
-  };
+  useEffect(() => {
+    console.log(whereDealerCardSlots);
+  }, [whereDealerCardSlots]);
 
   return (
     <div className={styles.wrapper} ref={wrapperRef}>
-      <div className={styles.buttonWrapper}>
+      <div className={styles.handWrapper} ref={handRef}>
+        <Hand
+          cards={dealerCardsDealt}
+          previousCards={previousDealerCardsDealt}
+          background={abstractClouds}
+          cardSize={cardSize}
+          whereHand={whereHand}
+          flipping={flipping}
+          setFlipping={setFlipping}
+          whereSlots={whereDealerCardSlots}
+          setSlots={setWhereDealerCardSlots}
+        />
+      </div>
+
+      <div className={styles.handWrapper} ref={handRef}>
+        <animated.div
+          className={styles.handFlip}
+          style={{
+            ...spring,
+            paddingLeft: whereHand ? `${whereHand.width * 0.05}px` : "0px",
+            paddingTop: whereHand ? `${whereHand.height * 0.05}px` : "0px",
+            backgroundColor: "yellow",
+            backfaceVisibility: "hidden",
+          }}
+        >
+          <div
+            className={styles.hand}
+            style={{
+              width: `${cardSize[0] * (1 + 2 / 3)}px`,
+              height: "90%",
+            }}
+          >
+            <div className={styles.dot}></div>
+            <div className={styles.dot}></div>
+            <div className={styles.dot}></div>
+            <div className={styles.dot}></div>
+            <div className={styles.dot}></div>
+            <div className={styles.dot}></div>
+          </div>
+          <div
+            ref={evenTestierRef}
+            style={{
+              position: "absolute",
+              width: `${cardSize[0]}px`,
+              height: `${cardSize[1]}px`,
+              left: 0,
+              top: 0,
+              transform: `translate3d(${
+                testRef.current &&
+                testRef.current.getBoundingClientRect().x - whereHand.x
+              }px, ${
+                testRef.current &&
+                testRef.current.getBoundingClientRect().y - whereHand.y
+              }px, 0)`,
+              backgroundSize: "cover",
+              backgroundImage: `url(${abstractClouds})`,
+              visibility: isTestCardVisiblie ? "visible" : "hidden",
+              backfaceVisibility: "hidden",
+            }}
+          ></div>
+          <button onClick={() => setFlipping(true)}>flip</button>
+        </animated.div>
+        <animated.div
+          className={styles.handFlip}
+          style={{
+            ...spring,
+            rotateX: "180deg",
+            backgroundColor: "yellow",
+            backfaceVisibility: "hidden",
+          }}
+        ></animated.div>
+      </div>
+      <div className={styles.shuffleWrapper} ref={shuffleRef}>
         <button
           onClick={() => setShuffling(["out", true])}
           className={styles.button}
@@ -172,86 +226,28 @@ const Main = () => {
         <button
           className={styles.button}
           onClick={() => {
-            setIsTestCardVisible(!isTestCardVisiblie);
+            if (dealerCardsDealt.length < 6) {
+              setDealerCardsDealt((prevCards) => {
+                setPreviousDealerCardsDealt(prevCards);
+                let cards = [...prevCards];
+                cards.push(["AH", false]);
+                return cards;
+              });
+            }
           }}
         >
-          set visible
+          add card
         </button>
-        <button
-          className={styles.button}
-          onClick={() => {
-            console.log(testRef.current.getBoundingClientRect());
-          }}
-        >
-          log test ref
-        </button>
-      </div>
 
-      <div className={styles.handWrapper} ref={handRef}>
-        <animated.div
-          className={styles.handFlip}
-          style={{
-            ...spring,
-
-            backgroundColor: "yellow",
-            backfaceVisibility: "hidden",
-          }}
-        >
-          <div
-            className={styles.hand}
-            style={{
-              width: `${cardSize[0] * (1 + 2 / 3)}px`,
-              height: "90%",
-              marginLeft: whereHand ? `${whereHand.width * 0.05}px` : "0px",
-              marginTop: whereHand ? `${whereHand.height * 0.05}px` : "0px",
-            }}
-          >
-            <div className={styles.dot}></div>
-            <div className={styles.dot}></div>
-            <div className={styles.dot}></div>
-            <div className={styles.dot}></div>
-            <div className={styles.dot} ref={testRef}></div>
-            <div className={styles.dot}></div>
-          </div>
-          <div
-            ref={evenTestierRef}
-            style={{
-              position: "absolute",
-              width: `${cardSize[0]}px`,
-              height: `${cardSize[1]}px`,
-              left: 0,
-              top: 0,
-              transform: `translate3d(${
-                testRef.current &&
-                testRef.current.getBoundingClientRect().x - whereHand.x
-              }px, ${
-                testRef.current &&
-                testRef.current.getBoundingClientRect().y - whereHand.y
-              }px, 0)`,
-              backgroundSize: "cover",
-              backgroundImage: `url(${abstractClouds})`,
-              visibility: isTestCardVisiblie ? "visible" : "hidden",
-              backfaceVisibility: "hidden",
-            }}
-          ></div>
-        </animated.div>
-        <animated.div
-          className={styles.handFlip}
-          style={{
-            ...spring,
-            rotateX: "180deg",
-            backgroundColor: "yellow",
-            backfaceVisibility: "hidden",
-          }}
-        ></animated.div>
-      </div>
-      <div className={styles.shuffleWrapper} ref={shuffleRef}>
         <Shuffle
           rect={whereShuffle}
           windowSize={windowSize}
           setHk={setHk}
+          dealerCardsDealt={dealerCardsDealt}
+          setDealerCardsDealt={setDealerCardsDealt}
+          previousDealerCardsDealt={previousDealerCardsDealt}
           hk={hk}
-          testXy={evenTestierRef.current && produceTestierRectXy()}
+          dealerCardSlots={whereDealerCardSlots && whereDealerCardSlots}
           cardSize={cardSize}
           background={background}
           changeBackground={changeBackground}
