@@ -25,29 +25,33 @@ import face from "../svg_playing_cards/fronts/png_96_dpi/hearts_queen.png";
 const Main = () => {
   const [windowSize, setWindowSize] = useState([0, 0]);
   const [cardSize, setCardSize] = useState([0, 0]);
-  const [whereHand, setWhereHand] = useState(null);
+  const [whereDealerHand, setWhereDealerHand] = useState(null);
+  const [wherePlayerHand, setWherePlayerHand] = useState(null);
 
   const [dealerCardsDealt, setDealerCardsDealt] = useState([]);
   const [previousDealerCardsDealt, setPreviousDealerCardsDealt] = useState([]);
-
   const [whereDealerCardSlots, setWhereDealerCardSlots] = useState(null);
+
+  const [playerCardsDealt, setPlayerCardsDealt] = useState([]);
+  const [previousPlayerCardsDealt, setPreviousPlayerCardsDealt] = useState([]);
+  const [wherePlayerCardSlots, setWherePlayerCardSlots] = useState(null);
 
   const [testRect, setTestRect] = useState(null);
 
   const [isTestCardVisiblie, setIsTestCardVisible] = useState(false);
 
   const [shuffling, setShuffling] = useState(["in", true]);
-  const [flipping, setFlipping] = useState(false);
+  const [dealerFlipping, setDealerFlipping] = useState(false);
+  const [playerFlipping, setPlayerFlipping] = useState(false);
 
   const [hk, setHk] = useState([0, 0]);
   const [whereShuffle, setWhereShuffle] = useState({});
 
   const wrapperRef = useRef();
 
-  const handRef = useRef();
+  const dealerHandRef = useRef();
+  const playerHandRef = useRef();
   const shuffleRef = useRef();
-  const testRef = useRef();
-  const evenTestierRef = useRef();
 
   const [background, setBackground] = useState([
     abstractClouds,
@@ -72,11 +76,14 @@ const Main = () => {
   };
 
   const calculateCardSize = () => {
-    let handRect = handRef.current.getBoundingClientRect();
-    setWhereHand(handRect);
+    let dealerHandRect = dealerHandRef.current.getBoundingClientRect();
+    setWhereDealerHand(dealerHandRect);
 
-    let availableHandHeight = handRect.height * 0.9;
-    let availableHandWidth = handRect.width * 0.9;
+    let playerHandRect = playerHandRef.current.getBoundingClientRect();
+    setWherePlayerHand(playerHandRect);
+
+    let availableHandHeight = dealerHandRect.height * 0.9;
+    let availableHandWidth = dealerHandRect.width * 0.9;
     let cardHeight;
     let cardWidth = (availableHandWidth / 8) * 3;
     console.log(cardWidth);
@@ -129,27 +136,44 @@ const Main = () => {
 
   return (
     <div className={styles.wrapper} ref={wrapperRef}>
-      <div className={styles.handWrapper} ref={handRef}>
+      <div className={styles.handWrapper} ref={dealerHandRef}>
         <Hand
           cards={dealerCardsDealt}
+          setCards={setDealerCardsDealt}
           previousCards={previousDealerCardsDealt}
-          background={abstractClouds}
+          background={background[0]}
           cardSize={cardSize}
-          whereHand={whereHand}
-          flipping={flipping}
-          setFlipping={setFlipping}
+          whereHand={whereDealerHand}
+          flipping={dealerFlipping}
+          setFlipping={setDealerFlipping}
           whereSlots={whereDealerCardSlots}
           setSlots={setWhereDealerCardSlots}
         />
       </div>
 
-      <div className={styles.handWrapper} ref={handRef}>
-        <animated.div
+      <div className={styles.handWrapper} ref={playerHandRef}>
+        <Hand
+          cards={playerCardsDealt}
+          setCards={setPlayerCardsDealt}
+          previousCards={previousPlayerCardsDealt}
+          background={background[0]}
+          cardSize={cardSize}
+          whereHand={wherePlayerHand}
+          flipping={playerFlipping}
+          setFlipping={setPlayerFlipping}
+          whereSlots={wherePlayerCardSlots}
+          setSlots={setWherePlayerCardSlots}
+        />
+        {/* <animated.div
           className={styles.handFlip}
           style={{
             ...spring,
-            paddingLeft: whereHand ? `${whereHand.width * 0.05}px` : "0px",
-            paddingTop: whereHand ? `${whereHand.height * 0.05}px` : "0px",
+            paddingLeft: whereDealerHand
+              ? `${whereDealerHand.width * 0.05}px`
+              : "0px",
+            paddingTop: whereDealerHand
+              ? `${whereDealerHand.height * 0.05}px`
+              : "0px",
             backgroundColor: "yellow",
             backfaceVisibility: "hidden",
           }}
@@ -168,28 +192,8 @@ const Main = () => {
             <div className={styles.dot}></div>
             <div className={styles.dot}></div>
           </div>
-          <div
-            ref={evenTestierRef}
-            style={{
-              position: "absolute",
-              width: `${cardSize[0]}px`,
-              height: `${cardSize[1]}px`,
-              left: 0,
-              top: 0,
-              transform: `translate3d(${
-                testRef.current &&
-                testRef.current.getBoundingClientRect().x - whereHand.x
-              }px, ${
-                testRef.current &&
-                testRef.current.getBoundingClientRect().y - whereHand.y
-              }px, 0)`,
-              backgroundSize: "cover",
-              backgroundImage: `url(${abstractClouds})`,
-              visibility: isTestCardVisiblie ? "visible" : "hidden",
-              backfaceVisibility: "hidden",
-            }}
-          ></div>
-          <button onClick={() => setFlipping(true)}>flip</button>
+
+          <button onClick={() => setDealerFlipping(true)}>flip</button>
         </animated.div>
         <animated.div
           className={styles.handFlip}
@@ -199,7 +203,7 @@ const Main = () => {
             backgroundColor: "yellow",
             backfaceVisibility: "hidden",
           }}
-        ></animated.div>
+        ></animated.div> */}
       </div>
       <div className={styles.shuffleWrapper} ref={shuffleRef}>
         <button
@@ -213,12 +217,8 @@ const Main = () => {
         <button
           className={styles.button}
           onClick={() => {
-            springApi.start({
-              from: { transform: `perspective(600px) rotateX(0deg)` },
-              to: {
-                transform: `perspective(600px) rotateX(180deg)`,
-              },
-            });
+            setDealerFlipping(true);
+            setPlayerFlipping(true);
           }}
         >
           flip
@@ -229,14 +229,33 @@ const Main = () => {
             if (dealerCardsDealt.length < 6) {
               setDealerCardsDealt((prevCards) => {
                 setPreviousDealerCardsDealt(prevCards);
+
                 let cards = [...prevCards];
+
                 cards.push(["AH", false]);
                 return cards;
               });
             }
           }}
         >
-          add card
+          add dealer card
+        </button>
+        <button
+          className={styles.button}
+          onClick={() => {
+            if (playerCardsDealt.length < 6) {
+              setPlayerCardsDealt((prevCards) => {
+                setPreviousPlayerCardsDealt(prevCards);
+
+                let cards = [...prevCards];
+
+                cards.push(["AH", false]);
+                return cards;
+              });
+            }
+          }}
+        >
+          add player card
         </button>
 
         <Shuffle
@@ -246,8 +265,12 @@ const Main = () => {
           dealerCardsDealt={dealerCardsDealt}
           setDealerCardsDealt={setDealerCardsDealt}
           previousDealerCardsDealt={previousDealerCardsDealt}
-          hk={hk}
           dealerCardSlots={whereDealerCardSlots && whereDealerCardSlots}
+          playerCardsDealt={playerCardsDealt}
+          setPlayerCardsDealt={setPlayerCardsDealt}
+          previousPlayerCardsDealt={previousPlayerCardsDealt}
+          playerCardSlots={wherePlayerCardSlots && wherePlayerCardSlots}
+          hk={hk}
           cardSize={cardSize}
           background={background}
           changeBackground={changeBackground}

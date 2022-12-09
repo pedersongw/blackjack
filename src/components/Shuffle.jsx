@@ -58,9 +58,7 @@ const Shuffle = (props) => {
           } else {
             api.current[i].start({
               xy: [props.hk[0], props.hk[1]],
-              onStart: () => {
-                props.setShuffling(["in", false]);
-              },
+
               config: {
                 friction: 30,
               },
@@ -147,11 +145,24 @@ const Shuffle = (props) => {
     }
   }, [props.rect]);
 
-  useEffect(() => {
-    const { dealerCardsDealt: cards, previousDealerCardsDealt: prevCards } =
-      props;
-    if (cards.length !== prevCards.length) {
-      let difference = cards.length - prevCards.length;
+  const dealCard = (arg) => {
+    console.log(props);
+    let cards;
+    let previousCards;
+    let determineSpringProps;
+    if (arg === "dealer") {
+      cards = props.dealerCardsDealt;
+      previousCards = props.previousDealerCardsDealt;
+      determineSpringProps = "dealer";
+    } else if (arg === "player") {
+      cards = props.playerCardsDealt;
+      previousCards = props.previousPlayerCardsDealt;
+      determineSpringProps = "player";
+    }
+
+    console.log(arg, cards, previousCards, determineSpringProps);
+    if (cards.length !== previousCards.length) {
+      let difference = cards.length - previousCards.length;
       let startingIndex = cards.length - difference;
       let newCards = cards.slice(-Math.abs(difference));
       for (let i = 0; i < newCards.length; i++) {
@@ -165,8 +176,8 @@ const Shuffle = (props) => {
           });
           api.current[thisCard].start({
             xy: [
-              props.dealerCardSlots[startingIndex + i].x,
-              props.dealerCardSlots[startingIndex + i].y,
+              props[`${determineSpringProps}CardSlots`][startingIndex + i].x,
+              props[`${determineSpringProps}CardSlots`][startingIndex + i].y,
             ],
             config: {
               friction: 30,
@@ -178,11 +189,20 @@ const Shuffle = (props) => {
                 indexes[thisCard] = 0;
                 return indexes;
               });
-              props.setDealerCardsDealt((prevCards) => {
-                let cards = [...prevCards];
-                cards[startingIndex + i][1] = true;
-                return cards;
-              });
+              if (arg === "dealer") {
+                props.setDealerCardsDealt((prevCards) => {
+                  let cards = [...prevCards];
+                  cards[startingIndex + i][1] = true;
+                  return cards;
+                });
+              } else if (arg === "player") {
+                props.setPlayerCardsDealt((prevCards) => {
+                  let cards = [...prevCards];
+                  cards[startingIndex + i][1] = true;
+                  return cards;
+                });
+              }
+
               api.current[thisCard].start({
                 xy: [coords[thisCard][0], coords[thisCard][1]],
                 immediate: true,
@@ -192,7 +212,73 @@ const Shuffle = (props) => {
         }, i * 100);
       }
     }
+  };
+
+  useEffect(() => {
+    dealCard("dealer");
   }, [props.dealerCardsDealt.length]);
+
+  useEffect(() => {
+    dealCard("player");
+  }, [props.playerCardsDealt.length]);
+
+  // useEffect(() => {
+  //   const { playerCardsDealt: cards, previousPlayerCardsDealt: prevCards } =
+  //     props;
+  //   if (cards.length !== prevCards.length) {
+  //     let difference = cards.length - prevCards.length;
+  //     let startingIndex = cards.length - difference;
+  //     let newCards = cards.slice(-Math.abs(difference));
+  //     for (let i = 0; i < newCards.length; i++) {
+  //       setTimeout(() => {
+  //         let thisCard = lastCardMoved - 1;
+  //         setLastCardMoved(thisCard);
+  //         setZIndexes((prevIndexes) => {
+  //           let indexes = [...prevIndexes];
+  //           indexes[thisCard] = 51 - thisCard;
+  //           return indexes;
+  //         });
+  //         api.current[thisCard].start({
+  //           xy: [
+  //             props.playerCardSlots[startingIndex + i].x,
+  //             props.playerCardSlots[startingIndex + i].y,
+  //           ],
+  //           config: {
+  //             friction: 30,
+  //             clamp: true,
+  //           },
+  //           onRest: () => {
+  //             setZIndexes((prevIndexes) => {
+  //               let indexes = [...prevIndexes];
+  //               indexes[thisCard] = 0;
+  //               return indexes;
+  //             });
+  //             props.setPlayerCardsDealt((prevCards) => {
+  //               let cards = [...prevCards];
+  //               cards[startingIndex + i][1] = true;
+  //               return cards;
+  //             });
+  //             api.current[thisCard].start({
+  //               xy: [coords[thisCard][0], coords[thisCard][1]],
+  //               immediate: true,
+  //             });
+  //           },
+  //         });
+  //       }, i * 100);
+  //     }
+  //   }
+  // }, [props.playerCardsDealt.length]);
+
+  useEffect(() => {
+    if (props.dealerCardsDealt.length === 0) {
+      setZIndexes([0]);
+      setLastCardMoved(52);
+      api.start({
+        xy: [props.hk[0], props.hk[1]],
+        immediate: true,
+      });
+    }
+  }, [props.dealerCardsDealt]);
 
   return (
     <React.Fragment>

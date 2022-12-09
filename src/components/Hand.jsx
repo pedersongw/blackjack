@@ -28,7 +28,8 @@ const Hand = (props) => {
     },
   }));
 
-  useEffect(() => {
+  const setSlots = () => {
+    console.log("settingSlots");
     let slots = [
       firstRef.current.getBoundingClientRect(),
       secondRef.current.getBoundingClientRect(),
@@ -39,7 +40,18 @@ const Hand = (props) => {
     ];
     props.setSlots(slots);
     console.log(slots);
-  }, [firstRef.current, window.innerHeight, window.innerWidth]);
+  };
+
+  useEffect(() => {
+    window.addEventListener("resize", setSlots);
+    return () => {
+      window.removeEventListener("resize", setSlots);
+    };
+  }, []);
+
+  useEffect(() => {
+    setSlots();
+  }, [firstRef.current]);
 
   useEffect(() => {
     if (props.flipping) {
@@ -47,6 +59,9 @@ const Hand = (props) => {
         from: { transform: `perspective(600px) rotateX(0deg)` },
         to: {
           transform: `perspective(600px) rotateX(180deg)`,
+        },
+        onRest: () => {
+          props.setCards([]);
         },
       });
     }
@@ -93,9 +108,11 @@ const Hand = (props) => {
                     left: 0,
                     top: 0,
                     transform: `translate3d(${
-                      props.whereSlots && props.whereSlots[index].x
+                      props.whereSlots &&
+                      props.whereSlots[index].x - props.whereHand.x
                     }px, ${
-                      props.whereSlots && props.whereSlots[index].y
+                      props.whereSlots &&
+                      props.whereSlots[index].y - props.whereHand.y
                     }px, 0)`,
                     backgroundSize: "cover",
                     backgroundImage: `url(${props.background})`,
