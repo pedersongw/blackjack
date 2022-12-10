@@ -99,8 +99,10 @@ const Hand = (props) => {
           {props.cards &&
             props.cards.map((card, index) => {
               return (
-                <div
+                <img
                   key={index}
+                  src={props.background}
+                  alt="playing card"
                   style={{
                     position: "absolute",
                     width: `${props.cardSize[0]}px`,
@@ -114,11 +116,10 @@ const Hand = (props) => {
                       props.whereSlots &&
                       props.whereSlots[index].y - props.whereHand.y
                     }px, 0)`,
-                    backgroundSize: "cover",
-                    backgroundImage: `url(${props.background})`,
+
                     visibility: props.cards[index][1] ? "visible" : "hidden",
                   }}
-                ></div>
+                ></img>
               );
             })}
         </div>

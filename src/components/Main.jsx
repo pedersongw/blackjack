@@ -232,7 +232,10 @@ const Main = () => {
 
                 let cards = [...prevCards];
 
-                cards.push(["AH", false]);
+                cards.push([
+                  background[Math.floor(Math.random() * background.length)],
+                  false,
+                ]);
                 return cards;
               });
             }
@@ -249,7 +252,10 @@ const Main = () => {
 
                 let cards = [...prevCards];
 
-                cards.push(["AH", false]);
+                cards.push([
+                  background[Math.floor(Math.random() * background.length)],
+                  false,
+                ]);
                 return cards;
               });
             }

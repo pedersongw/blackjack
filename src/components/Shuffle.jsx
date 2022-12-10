@@ -4,8 +4,11 @@ import styles from "./Shuffle.module.css";
 
 const Shuffle = (props) => {
   const [coords, setCoords] = useState([]);
+
   const [lastCardMoved, setLastCardMoved] = useState(52);
   const [zIndexes, setZIndexes] = useState([]);
+
+  const [faces, setFaces] = useState(null);
 
   const ref = useRef(null);
 
@@ -17,27 +20,25 @@ const Shuffle = (props) => {
     []
   );
 
-  const testMove = () => {
-    let x = props.testXy[0];
-    let y = props.testXy[1];
-    api.current[51].start({
-      xy: [x, y],
-      config: {
-        friction: 30,
-        clamp: true,
-      },
-    });
+  const [flipSprings, flipSpringsApi] = useSprings(
+    coords.length,
+    (index) => ({
+      from: { transform: `perspective(600px) rotateX(0deg)` },
+    }),
+    []
+  );
+
+  const resetFaces = () => {
+    let arr = [];
+    for (let i = 0; i < 52; i++) {
+      arr.push(props.background[0]);
+    }
+    setFaces(arr);
   };
 
-  const testMoveBack = () => {
-    api.current[51].start({
-      xy: [props.hk[0], props.hk[1]],
-      config: {
-        friction: 30,
-        clamp: true,
-      },
-    });
-  };
+  useEffect(() => {
+    resetFaces();
+  }, []);
 
   useEffect(() => {
     if (props.shuffling[0] === "in" && props.shuffling[1]) {
@@ -174,6 +175,20 @@ const Shuffle = (props) => {
             indexes[thisCard] = 51 - thisCard;
             return indexes;
           });
+          setFaces((prevFaces) => {
+            let faces = [...prevFaces];
+            faces[thisCard] =
+              arg === "dealer"
+                ? props.dealerCardsDealt[startingIndex + i][0]
+                : props.playerCardsDealt[startingIndex + i][0];
+            return faces;
+          });
+
+          flipSpringsApi.current[thisCard].start({
+            to: {
+              transform: `perspective(600px) rotateX(180deg)`,
+            },
+          });
           api.current[thisCard].start({
             xy: [
               props[`${determineSpringProps}CardSlots`][startingIndex + i].x,
@@ -222,59 +237,17 @@ const Shuffle = (props) => {
     dealCard("player");
   }, [props.playerCardsDealt.length]);
 
-  // useEffect(() => {
-  //   const { playerCardsDealt: cards, previousPlayerCardsDealt: prevCards } =
-  //     props;
-  //   if (cards.length !== prevCards.length) {
-  //     let difference = cards.length - prevCards.length;
-  //     let startingIndex = cards.length - difference;
-  //     let newCards = cards.slice(-Math.abs(difference));
-  //     for (let i = 0; i < newCards.length; i++) {
-  //       setTimeout(() => {
-  //         let thisCard = lastCardMoved - 1;
-  //         setLastCardMoved(thisCard);
-  //         setZIndexes((prevIndexes) => {
-  //           let indexes = [...prevIndexes];
-  //           indexes[thisCard] = 51 - thisCard;
-  //           return indexes;
-  //         });
-  //         api.current[thisCard].start({
-  //           xy: [
-  //             props.playerCardSlots[startingIndex + i].x,
-  //             props.playerCardSlots[startingIndex + i].y,
-  //           ],
-  //           config: {
-  //             friction: 30,
-  //             clamp: true,
-  //           },
-  //           onRest: () => {
-  //             setZIndexes((prevIndexes) => {
-  //               let indexes = [...prevIndexes];
-  //               indexes[thisCard] = 0;
-  //               return indexes;
-  //             });
-  //             props.setPlayerCardsDealt((prevCards) => {
-  //               let cards = [...prevCards];
-  //               cards[startingIndex + i][1] = true;
-  //               return cards;
-  //             });
-  //             api.current[thisCard].start({
-  //               xy: [coords[thisCard][0], coords[thisCard][1]],
-  //               immediate: true,
-  //             });
-  //           },
-  //         });
-  //       }, i * 100);
-  //     }
-  //   }
-  // }, [props.playerCardsDealt.length]);
-
   useEffect(() => {
     if (props.dealerCardsDealt.length === 0) {
+      resetFaces();
       setZIndexes([0]);
       setLastCardMoved(52);
       api.start({
         xy: [props.hk[0], props.hk[1]],
+        immediate: true,
+      });
+      flipSpringsApi.start({
+        to: { transform: `perspective(600px) rotateX(0deg)` },
         immediate: true,
       });
     }
@@ -291,20 +264,27 @@ const Shuffle = (props) => {
               transform: springs[index].xy.to(
                 (x, y) => `translate3d(${x}px, ${y}px, 0)`
               ),
-              backgroundImage: `url(${props.background[0]})`,
-              backgroundSize: "cover",
               width: `${props.cardSize[0]}px`,
               height: `${props.cardSize[1]}px`,
               zIndex: zIndexes[index],
             }}
-          />
+          >
+            <animated.img
+              src={props.background[0]}
+              style={flipSprings[index]}
+              className={styles.cardFace}
+            ></animated.img>
+            <animated.img
+              src={faces ? faces[index] : null}
+              style={{
+                ...flipSprings[index],
+                rotateX: "180deg",
+                backfaceVisibility: "hidden",
+              }}
+              className={styles.cardFace}
+            ></animated.img>
+          </animated.div>
         ))}
-      <button onClick={() => testMove()} disabled={!props.testXy}>
-        Test Move
-      </button>
-      <button onClick={() => testMoveBack()} disabled={!props.testXy}>
-        Test Move Back
-      </button>
     </React.Fragment>
   );
 };
