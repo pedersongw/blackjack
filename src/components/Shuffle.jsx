@@ -9,6 +9,7 @@ const Shuffle = (props) => {
   const [zIndexes, setZIndexes] = useState([]);
 
   const [faces, setFaces] = useState(null);
+  const [facesLoaded, setFacesLoaded] = useState(null);
 
   const ref = useRef(null);
 
@@ -30,10 +31,13 @@ const Shuffle = (props) => {
 
   const resetFaces = () => {
     let arr = [];
+    let loadedArr = [];
     for (let i = 0; i < 52; i++) {
-      arr.push(props.background[0]);
+      arr.push(null);
+      loadedArr.push(false);
     }
     setFaces(arr);
+    setFacesLoaded(loadedArr);
   };
 
   useEffect(() => {
@@ -167,21 +171,21 @@ const Shuffle = (props) => {
       let startingIndex = cards.length - difference;
       let newCards = cards.slice(-Math.abs(difference));
       for (let i = 0; i < newCards.length; i++) {
+        let thisCard = lastCardMoved - 1;
+        setFaces((prevFaces) => {
+          let faces = [...prevFaces];
+          faces[thisCard] =
+            arg === "dealer"
+              ? props.dealerCardsDealt[startingIndex + i][0]
+              : props.playerCardsDealt[startingIndex + i][0];
+          return faces;
+        });
         setTimeout(() => {
-          let thisCard = lastCardMoved - 1;
           setLastCardMoved(thisCard);
           setZIndexes((prevIndexes) => {
             let indexes = [...prevIndexes];
             indexes[thisCard] = 51 - thisCard;
             return indexes;
-          });
-          setFaces((prevFaces) => {
-            let faces = [...prevFaces];
-            faces[thisCard] =
-              arg === "dealer"
-                ? props.dealerCardsDealt[startingIndex + i][0]
-                : props.playerCardsDealt[startingIndex + i][0];
-            return faces;
           });
 
           flipSpringsApi.current[thisCard].start({
@@ -207,13 +211,18 @@ const Shuffle = (props) => {
               if (arg === "dealer") {
                 props.setDealerCardsDealt((prevCards) => {
                   let cards = [...prevCards];
-                  cards[startingIndex + i][1] = true;
+                  if (cards[startingIndex + i]) {
+                    cards[startingIndex + i][1] = true;
+                  }
                   return cards;
                 });
               } else if (arg === "player") {
                 props.setPlayerCardsDealt((prevCards) => {
                   let cards = [...prevCards];
-                  cards[startingIndex + i][1] = true;
+                  if (cards[startingIndex + i]) {
+                    cards[startingIndex + i][1] = true;
+                  }
+
                   return cards;
                 });
               }
@@ -224,7 +233,7 @@ const Shuffle = (props) => {
               });
             },
           });
-        }, i * 100);
+        }, i * 100 + 300);
       }
     }
   };
@@ -276,6 +285,7 @@ const Shuffle = (props) => {
             ></animated.img>
             <animated.img
               src={faces ? faces[index] : null}
+              onLoad={() => console.log(`loaded${index}`)}
               style={{
                 ...flipSprings[index],
                 rotateX: "180deg",

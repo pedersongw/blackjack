@@ -101,7 +101,7 @@ const Hand = (props) => {
               return (
                 <img
                   key={index}
-                  src={props.background}
+                  src={props.cards[index][0]}
                   alt="playing card"
                   style={{
                     position: "absolute",
