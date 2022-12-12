@@ -227,10 +227,10 @@ const Shuffle = (props) => {
                 });
               }
 
-              api.current[thisCard].start({
-                xy: [coords[thisCard][0], coords[thisCard][1]],
-                immediate: true,
-              });
+              // api.current[thisCard].start({
+              //   xy: [coords[thisCard][0], coords[thisCard][1]],
+              //   immediate: true,
+              // });
             },
           });
         }, i * 100 + 300);
