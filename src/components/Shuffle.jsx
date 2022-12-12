@@ -227,10 +227,10 @@ const Shuffle = (props) => {
                 });
               }
 
-              // api.current[thisCard].start({
-              //   xy: [coords[thisCard][0], coords[thisCard][1]],
-              //   immediate: true,
-              // });
+              api.current[thisCard].start({
+                xy: [coords[thisCard][0], coords[thisCard][1]],
+                immediate: true,
+              });
             },
           });
         }, i * 100 + 300);
@@ -276,7 +276,6 @@ const Shuffle = (props) => {
               width: `${props.cardSize[0]}px`,
               height: `${props.cardSize[1]}px`,
               zIndex: zIndexes[index],
-              backfaceVisibility: "hidden",
             }}
           >
             <animated.img
@@ -290,7 +289,7 @@ const Shuffle = (props) => {
               style={{
                 ...flipSprings[index],
                 rotateX: "180deg",
-                backfaceVisibility: "hidden",
+                WebkitBackfaceVisibility: "hidden",
               }}
               className={styles.cardFace}
             ></animated.img>
