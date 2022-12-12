@@ -279,16 +279,18 @@ const Shuffle = (props) => {
             }}
           >
             <animated.img
-              src={props.background[0]}
-              style={flipSprings[index]}
-              className={styles.cardFace}
-            ></animated.img>
-            <animated.img
               src={faces ? faces[index] : null}
               onLoad={() => console.log(`loaded${index}`)}
               style={{
                 ...flipSprings[index],
                 rotateX: "180deg",
+              }}
+              className={styles.cardFace}
+            ></animated.img>
+            <animated.img
+              src={props.background[0]}
+              style={{
+                ...flipSprings[index],
                 WebkitBackfaceVisibility: "hidden",
               }}
               className={styles.cardFace}
