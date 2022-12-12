@@ -73,13 +73,8 @@ const Hand = (props) => {
         className={styles.handFlip}
         style={{
           ...spring,
-          paddingLeft: props.whereHand
-            ? `${props.whereHand.width * 0.05}px`
-            : "0px",
-          paddingTop: props.whereHand
-            ? `${props.whereHand.height * 0.05}px`
-            : "0px",
-          backgroundColor: "yellow",
+
+          backgroundColor: "lightgreen",
           backfaceVisibility: "hidden",
         }}
       >
@@ -88,6 +83,12 @@ const Hand = (props) => {
           style={{
             width: `${props.cardSize[0] * (1 + 2 / 3)}px`,
             height: "90%",
+            paddingLeft: props.whereHand
+              ? `${props.whereHand.width * 0.05}px`
+              : "0px",
+            paddingTop: props.whereHand
+              ? `${props.whereHand.height * 0.05}px`
+              : "0px",
           }}
         >
           <div className={styles.dot} ref={firstRef}></div>
@@ -129,7 +130,7 @@ const Hand = (props) => {
         style={{
           ...spring,
           rotateX: "180deg",
-          backgroundColor: "yellow",
+          backgroundColor: "lightgreen",
           backfaceVisibility: "hidden",
         }}
       ></animated.div>

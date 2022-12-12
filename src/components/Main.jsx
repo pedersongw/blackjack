@@ -20,7 +20,61 @@ import frog from "../svg_playing_cards/backs/png_96_dpi/frog.png";
 import red from "../svg_playing_cards/backs/png_96_dpi/red.png";
 import red2 from "../svg_playing_cards/backs/png_96_dpi/red2.png";
 
-import face from "../svg_playing_cards/fronts/png_96_dpi/hearts_queen.png";
+import C2 from "../svg_playing_cards/fronts/png_96_dpi/clubs_2.png";
+import C3 from "../svg_playing_cards/fronts/png_96_dpi/clubs_3.png";
+import C4 from "../svg_playing_cards/fronts/png_96_dpi/clubs_4.png";
+import C5 from "../svg_playing_cards/fronts/png_96_dpi/clubs_5.png";
+import C6 from "../svg_playing_cards/fronts/png_96_dpi/clubs_6.png";
+import C7 from "../svg_playing_cards/fronts/png_96_dpi/clubs_7.png";
+import C8 from "../svg_playing_cards/fronts/png_96_dpi/clubs_8.png";
+import C9 from "../svg_playing_cards/fronts/png_96_dpi/clubs_9.png";
+import C10 from "../svg_playing_cards/fronts/png_96_dpi/clubs_10.png";
+import CJ from "../svg_playing_cards/fronts/png_96_dpi/clubs_jack.png";
+import CQ from "../svg_playing_cards/fronts/png_96_dpi/clubs_queen.png";
+import CK from "../svg_playing_cards/fronts/png_96_dpi/clubs_king.png";
+import CA from "../svg_playing_cards/fronts/png_96_dpi/clubs_ace.png";
+
+import D2 from "../svg_playing_cards/fronts/png_96_dpi/diamonds_2.png";
+import D3 from "../svg_playing_cards/fronts/png_96_dpi/diamonds_3.png";
+import D4 from "../svg_playing_cards/fronts/png_96_dpi/diamonds_4.png";
+import D5 from "../svg_playing_cards/fronts/png_96_dpi/diamonds_5.png";
+import D6 from "../svg_playing_cards/fronts/png_96_dpi/diamonds_6.png";
+import D7 from "../svg_playing_cards/fronts/png_96_dpi/diamonds_7.png";
+import D8 from "../svg_playing_cards/fronts/png_96_dpi/diamonds_8.png";
+import D9 from "../svg_playing_cards/fronts/png_96_dpi/diamonds_9.png";
+import D10 from "../svg_playing_cards/fronts/png_96_dpi/diamonds_10.png";
+import DJ from "../svg_playing_cards/fronts/png_96_dpi/diamonds_jack.png";
+import DQ from "../svg_playing_cards/fronts/png_96_dpi/diamonds_queen.png";
+import DK from "../svg_playing_cards/fronts/png_96_dpi/diamonds_king.png";
+import DA from "../svg_playing_cards/fronts/png_96_dpi/diamonds_ace.png";
+
+import H2 from "../svg_playing_cards/fronts/png_96_dpi/hearts_2.png";
+import H3 from "../svg_playing_cards/fronts/png_96_dpi/hearts_3.png";
+import H4 from "../svg_playing_cards/fronts/png_96_dpi/hearts_4.png";
+import H5 from "../svg_playing_cards/fronts/png_96_dpi/hearts_5.png";
+import H6 from "../svg_playing_cards/fronts/png_96_dpi/hearts_6.png";
+import H7 from "../svg_playing_cards/fronts/png_96_dpi/hearts_7.png";
+import H8 from "../svg_playing_cards/fronts/png_96_dpi/hearts_8.png";
+import H9 from "../svg_playing_cards/fronts/png_96_dpi/hearts_9.png";
+import H10 from "../svg_playing_cards/fronts/png_96_dpi/hearts_10.png";
+import HJ from "../svg_playing_cards/fronts/png_96_dpi/hearts_jack.png";
+import HQ from "../svg_playing_cards/fronts/png_96_dpi/hearts_queen.png";
+import HK from "../svg_playing_cards/fronts/png_96_dpi/hearts_king.png";
+import HA from "../svg_playing_cards/fronts/png_96_dpi/hearts_ace.png";
+
+import S2 from "../svg_playing_cards/fronts/png_96_dpi/spades_2.png";
+import S3 from "../svg_playing_cards/fronts/png_96_dpi/spades_3.png";
+import S4 from "../svg_playing_cards/fronts/png_96_dpi/spades_4.png";
+import S5 from "../svg_playing_cards/fronts/png_96_dpi/spades_5.png";
+import S6 from "../svg_playing_cards/fronts/png_96_dpi/spades_6.png";
+import S7 from "../svg_playing_cards/fronts/png_96_dpi/spades_7.png";
+import S8 from "../svg_playing_cards/fronts/png_96_dpi/spades_8.png";
+import S9 from "../svg_playing_cards/fronts/png_96_dpi/spades_9.png";
+import S10 from "../svg_playing_cards/fronts/png_96_dpi/spades_10.png";
+import SJ from "../svg_playing_cards/fronts/png_96_dpi/spades_jack.png";
+import SQ from "../svg_playing_cards/fronts/png_96_dpi/spades_queen.png";
+import SK from "../svg_playing_cards/fronts/png_96_dpi/spades_king.png";
+import SA from "../svg_playing_cards/fronts/png_96_dpi/spades_ace.png";
 
 const Main = () => {
   const [windowSize, setWindowSize] = useState([0, 0]);
@@ -68,6 +122,61 @@ const Main = () => {
     red,
   ]);
 
+  const [cardsInDeck, setCardsInDeck] = useState([
+    C2,
+    C3,
+    C4,
+    C5,
+    C6,
+    C7,
+    C8,
+    C9,
+    C10,
+    CJ,
+    CQ,
+    CK,
+    CA,
+    D2,
+    D3,
+    D4,
+    D5,
+    D6,
+    D7,
+    D8,
+    D9,
+    D10,
+    DJ,
+    DQ,
+    DK,
+    DA,
+    H2,
+    H3,
+    H4,
+    H5,
+    H6,
+    H7,
+    H8,
+    H9,
+    H10,
+    HJ,
+    HQ,
+    HK,
+    HA,
+    S2,
+    S3,
+    S4,
+    S5,
+    S6,
+    S7,
+    S8,
+    S9,
+    S10,
+    SJ,
+    SQ,
+    SK,
+    SA,
+  ]);
+
   const changeBackground = () => {
     let bg = [...background];
     bg.unshift(bg.pop());
@@ -105,6 +214,63 @@ const Main = () => {
     setWhereShuffle(shuffleRect);
     console.log("resizing");
   }
+
+  const resetDeck = () => {
+    setCardsInDeck([
+      C2,
+      C3,
+      C4,
+      C5,
+      C6,
+      C7,
+      C8,
+      C9,
+      C10,
+      CJ,
+      CQ,
+      CK,
+      CA,
+      D2,
+      D3,
+      D4,
+      D5,
+      D6,
+      D7,
+      D8,
+      D9,
+      D10,
+      DJ,
+      DQ,
+      DK,
+      DA,
+      H2,
+      H3,
+      H4,
+      H5,
+      H6,
+      H7,
+      H8,
+      H9,
+      H10,
+      HJ,
+      HQ,
+      HK,
+      HA,
+      S2,
+      S3,
+      S4,
+      S5,
+      S6,
+      S7,
+      S8,
+      S9,
+      S10,
+      SJ,
+      SQ,
+      SK,
+      SA,
+    ]);
+  };
 
   useEffect(() => {
     window.addEventListener("resize", handleResize);
@@ -229,13 +395,20 @@ const Main = () => {
             if (dealerCardsDealt.length < 6) {
               setDealerCardsDealt((prevCards) => {
                 setPreviousDealerCardsDealt(prevCards);
-
+                let deck = [...cardsInDeck];
                 let cards = [...prevCards];
-
-                cards.push([
-                  background[Math.floor(Math.random() * background.length)],
+                let cardDealt = [
+                  deck[Math.floor(Math.random() * deck.length)],
                   false,
-                ]);
+                ];
+                for (let i = 0; i < deck.length; i++) {
+                  if (cardDealt[0] === deck[i]) {
+                    console.log("card found");
+                    deck.splice(i, 1);
+                  }
+                }
+                cards.push(cardDealt);
+                setCardsInDeck(deck);
                 return cards;
               });
             }
@@ -249,13 +422,20 @@ const Main = () => {
             if (playerCardsDealt.length < 6) {
               setPlayerCardsDealt((prevCards) => {
                 setPreviousPlayerCardsDealt(prevCards);
-
+                let deck = [...cardsInDeck];
                 let cards = [...prevCards];
-
-                cards.push([
-                  background[Math.floor(Math.random() * background.length)],
+                let cardDealt = [
+                  deck[Math.floor(Math.random() * deck.length)],
                   false,
-                ]);
+                ];
+                for (let i = 0; i < deck.length; i++) {
+                  if (cardDealt[0] === deck[i]) {
+                    console.log("card found");
+                    deck.splice(i, 1);
+                  }
+                }
+                cards.push(cardDealt);
+                setCardsInDeck(deck);
                 return cards;
               });
             }
