@@ -166,8 +166,8 @@ const Shuffle = (props) => {
           let faces = [...prevFaces];
           faces[thisCard] =
             arg === "dealer"
-              ? props.dealerCardsDealt[startingIndex + i][0]
-              : props.playerCardsDealt[startingIndex + i][0];
+              ? props.dealerCardsDealt[startingIndex + i][1]
+              : props.playerCardsDealt[startingIndex + i][1];
           return faces;
         });
         setTimeout(() => {
@@ -184,7 +184,7 @@ const Shuffle = (props) => {
             },
             config: {
               mass: 7.8,
-              tension: 307,
+              tension: 407,
               friction: 85,
               clamp: true,
             },
@@ -196,7 +196,7 @@ const Shuffle = (props) => {
             ],
             config: {
               mass: 7.8,
-              tension: 307,
+              tension: 407,
               friction: 85,
               clamp: true,
             },
@@ -210,7 +210,7 @@ const Shuffle = (props) => {
                 props.setDealerCardsDealt((prevCards) => {
                   let cards = [...prevCards];
                   if (cards[startingIndex + i]) {
-                    cards[startingIndex + i][1] = true;
+                    cards[startingIndex + i][2] = true;
                   }
                   return cards;
                 });
@@ -218,7 +218,7 @@ const Shuffle = (props) => {
                 props.setPlayerCardsDealt((prevCards) => {
                   let cards = [...prevCards];
                   if (cards[startingIndex + i]) {
-                    cards[startingIndex + i][1] = true;
+                    cards[startingIndex + i][2] = true;
                   }
 
                   return cards;

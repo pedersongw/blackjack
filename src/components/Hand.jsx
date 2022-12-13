@@ -91,6 +91,12 @@ const Hand = (props) => {
               : "0px",
           }}
         >
+          <p style={{ position: "absolute", top: 0, left: 0 }}>
+            {props.score[0]}
+          </p>
+          <p style={{ position: "absolute", top: 0, right: 0 }}>
+            {props.score[1] && props.score[1]}
+          </p>
           <div className={styles.dot} ref={firstRef}></div>
           <div className={styles.dot} ref={secondRef}></div>
           <div className={styles.dot} ref={thirdRef}></div>
@@ -102,7 +108,7 @@ const Hand = (props) => {
               return (
                 <img
                   key={index}
-                  src={props.cards[index][0]}
+                  src={props.cards[index][1]}
                   alt="playing card"
                   style={{
                     position: "absolute",
@@ -118,7 +124,7 @@ const Hand = (props) => {
                       props.whereSlots[index].y - props.whereHand.y
                     }px, 0)`,
 
-                    visibility: props.cards[index][1] ? "visible" : "hidden",
+                    visibility: props.cards[index][2] ? "visible" : "hidden",
                   }}
                 ></img>
               );

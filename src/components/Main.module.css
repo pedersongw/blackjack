@@ -13,6 +13,13 @@
   flex: 1;
 }
 
+.shuffleWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-evenly;
+}
+
 .handWrapper {
   position: relative;
   max-height: 33%;
@@ -45,5 +52,4 @@
 
 .button {
   height: auto;
-  margin: 25px;
 }

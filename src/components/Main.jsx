@@ -82,6 +82,9 @@ const Main = () => {
   const [whereDealerHand, setWhereDealerHand] = useState(null);
   const [wherePlayerHand, setWherePlayerHand] = useState(null);
 
+  const [dealerScore, setDealerScore] = useState([0]);
+  const [playerScore, setPlayerScore] = useState([0]);
+
   const [dealerCardsDealt, setDealerCardsDealt] = useState([]);
   const [previousDealerCardsDealt, setPreviousDealerCardsDealt] = useState([]);
   const [whereDealerCardSlots, setWhereDealerCardSlots] = useState(null);
@@ -122,60 +125,60 @@ const Main = () => {
     red,
   ]);
 
-  const [cardsInDeck, setCardsInDeck] = useState([
-    C2,
-    C3,
-    C4,
-    C5,
-    C6,
-    C7,
-    C8,
-    C9,
-    C10,
-    CJ,
-    CQ,
-    CK,
-    CA,
-    D2,
-    D3,
-    D4,
-    D5,
-    D6,
-    D7,
-    D8,
-    D9,
-    D10,
-    DJ,
-    DQ,
-    DK,
-    DA,
-    H2,
-    H3,
-    H4,
-    H5,
-    H6,
-    H7,
-    H8,
-    H9,
-    H10,
-    HJ,
-    HQ,
-    HK,
-    HA,
-    S2,
-    S3,
-    S4,
-    S5,
-    S6,
-    S7,
-    S8,
-    S9,
-    S10,
-    SJ,
-    SQ,
-    SK,
-    SA,
-  ]);
+  const [cardsInDeck, setCardsInDeck] = useState({
+    C2: C2,
+    C3: C3,
+    C4: C4,
+    C5: C5,
+    C6: C6,
+    C7: C7,
+    C8: C8,
+    C9: C9,
+    C10: C10,
+    CJ: CJ,
+    CQ: CQ,
+    CK: CK,
+    CA: CA,
+    D2: D2,
+    D3: D3,
+    D4: D4,
+    D5: D5,
+    D6: D6,
+    D7: D7,
+    D8: D8,
+    D9: D9,
+    D10: D10,
+    DJ: DJ,
+    DQ: DQ,
+    DK: DK,
+    DA: DA,
+    H2: H2,
+    H3: H3,
+    H4: H4,
+    H5: H5,
+    H6: H6,
+    H7: H7,
+    H8: H8,
+    H9: H9,
+    H10: H10,
+    HJ: HJ,
+    HQ: HQ,
+    HK: HK,
+    HA: HA,
+    S2: S2,
+    S3: S3,
+    S4: S4,
+    S5: S5,
+    S6: S6,
+    S7: S7,
+    S8: S8,
+    S9: S9,
+    S10: S10,
+    SJ: SJ,
+    SQ: SQ,
+    SK: SK,
+    SA: SA,
+  });
 
   const changeBackground = () => {
     let bg = [...background];
@@ -216,60 +219,60 @@ const Main = () => {
   }
 
   const resetDeck = () => {
-    setCardsInDeck([
-      C2,
-      C3,
-      C4,
-      C5,
-      C6,
-      C7,
-      C8,
-      C9,
-      C10,
-      CJ,
-      CQ,
-      CK,
-      CA,
-      D2,
-      D3,
-      D4,
-      D5,
-      D6,
-      D7,
-      D8,
-      D9,
-      D10,
-      DJ,
-      DQ,
-      DK,
-      DA,
-      H2,
-      H3,
-      H4,
-      H5,
-      H6,
-      H7,
-      H8,
-      H9,
-      H10,
-      HJ,
-      HQ,
-      HK,
-      HA,
-      S2,
-      S3,
-      S4,
-      S5,
-      S6,
-      S7,
-      S8,
-      S9,
-      S10,
-      SJ,
-      SQ,
-      SK,
-      SA,
-    ]);
+    setCardsInDeck({
+      C2: C2,
+      C3: C3,
+      C4: C4,
+      C5: C5,
+      C6: C6,
+      C7: C7,
+      C8: C8,
+      C9: C9,
+      C10: C10,
+      CJ: CJ,
+      CQ: CQ,
+      CK: CK,
+      CA: CA,
+      D2: D2,
+      D3: D3,
+      D4: D4,
+      D5: D5,
+      D6: D6,
+      D7: D7,
+      D8: D8,
+      D9: D9,
+      D10: D10,
+      DJ: DJ,
+      DQ: DQ,
+      DK: DK,
+      DA: DA,
+      H2: H2,
+      H3: H3,
+      H4: H4,
+      H5: H5,
+      H6: H6,
+      H7: H7,
+      H8: H8,
+      H9: H9,
+      H10: H10,
+      HJ: HJ,
+      HQ: HQ,
+      HK: HK,
+      HA: HA,
+      S2: S2,
+      S3: S3,
+      S4: S4,
+      S5: S5,
+      S6: S6,
+      S7: S7,
+      S8: S8,
+      S9: S9,
+      S10: S10,
+      SJ: SJ,
+      SQ: SQ,
+      SK: SK,
+      SA: SA,
+    });
   };
 
   useEffect(() => {
@@ -297,14 +300,83 @@ const Main = () => {
   }));
 
   useEffect(() => {
-    console.log(whereDealerCardSlots);
-  }, [whereDealerCardSlots]);
+    let dealerCodes = [];
+    let playerCodes = [];
+    let dealerAces = 0;
+    let playerAces = 0;
+    let dealerTwoPossibleScores = [];
+    let playerTwoPossibleScores = [];
+    for (let i = 0; i < playerCardsDealt.length; i++) {
+      let arr = playerCardsDealt[i][0].split("");
+      arr.shift();
+      let code = arr.join("");
+      if (code === "J" || code === "Q" || code === "K") {
+        code = 10;
+      } else if (code === "A") {
+        playerAces++;
+        code = 1;
+      } else {
+        code = Number(code);
+      }
+      playerCodes.push(code);
+    }
+    for (let i = 0; i < dealerCardsDealt.length; i++) {
+      let arr = dealerCardsDealt[i][0].split("");
+      arr.shift();
+      let code = arr.join("");
+      if (code === "J" || code === "Q" || code === "K") {
+        code = 10;
+      } else if (code === "A") {
+        dealerAces++;
+        code = 1;
+      } else {
+        code = Number(code);
+      }
+      dealerCodes.push(code);
+    }
+    let reducedDealerLowerScore = dealerCodes.reduce(function (acc, current) {
+      return acc + current;
+    }, 0);
+
+    let reducedPlayerLowerScore = playerCodes.reduce(function (acc, current) {
+      return acc + current;
+    }, 0);
+
+    dealerTwoPossibleScores.push(reducedDealerLowerScore);
+    playerTwoPossibleScores.push(reducedPlayerLowerScore);
+
+    if (dealerAces > 0) {
+      dealerTwoPossibleScores.push(reducedDealerLowerScore + 10);
+    }
+
+    if (playerAces > 0) {
+      playerTwoPossibleScores.push(reducedPlayerLowerScore + 10);
+    }
+
+    setDealerScore(dealerTwoPossibleScores);
+    setPlayerScore(playerTwoPossibleScores);
+
+    if (!dealerCardsDealt[0] && !playerCardsDealt[0]) {
+      resetDeck();
+      setPlayerScore([0]);
+      setDealerScore([0]);
+    }
+  }, [playerCardsDealt, dealerCardsDealt]);
+
+  useEffect(() => {
+    console.log(cardsInDeck);
+  }, [cardsInDeck]);
+
+  useEffect(() => {
+    console.log(dealerScore, playerScore);
+  }, [dealerScore, playerScore]);
 
   return (
     <div className={styles.wrapper} ref={wrapperRef}>
       <div className={styles.handWrapper} ref={dealerHandRef}>
         <Hand
           cards={dealerCardsDealt}
+          score={dealerScore}
           setCards={setDealerCardsDealt}
           previousCards={previousDealerCardsDealt}
           background={background[0]}
@@ -320,6 +392,7 @@ const Main = () => {
       <div className={styles.handWrapper} ref={playerHandRef}>
         <Hand
           cards={playerCardsDealt}
+          score={playerScore}
           setCards={setPlayerCardsDealt}
           previousCards={previousPlayerCardsDealt}
           background={background[0]}
@@ -330,46 +403,6 @@ const Main = () => {
           whereSlots={wherePlayerCardSlots}
           setSlots={setWherePlayerCardSlots}
         />
-        {/* <animated.div
-          className={styles.handFlip}
-          style={{
-            ...spring,
-            paddingLeft: whereDealerHand
-              ? `${whereDealerHand.width * 0.05}px`
-              : "0px",
-            paddingTop: whereDealerHand
-              ? `${whereDealerHand.height * 0.05}px`
-              : "0px",
-            backgroundColor: "yellow",
-            backfaceVisibility: "hidden",
-          }}
-        >
-          <div
-            className={styles.hand}
-            style={{
-              width: `${cardSize[0] * (1 + 2 / 3)}px`,
-              height: "90%",
-            }}
-          >
-            <div className={styles.dot}></div>
-            <div className={styles.dot}></div>
-            <div className={styles.dot}></div>
-            <div className={styles.dot}></div>
-            <div className={styles.dot}></div>
-            <div className={styles.dot}></div>
-          </div>
-
-          <button onClick={() => setDealerFlipping(true)}>flip</button>
-        </animated.div>
-        <animated.div
-          className={styles.handFlip}
-          style={{
-            ...spring,
-            rotateX: "180deg",
-            backgroundColor: "yellow",
-            backfaceVisibility: "hidden",
-          }}
-        ></animated.div> */}
       </div>
       <div className={styles.shuffleWrapper} ref={shuffleRef}>
         <button
@@ -395,16 +428,15 @@ const Main = () => {
             if (dealerCardsDealt.length < 6) {
               setDealerCardsDealt((prevCards) => {
                 setPreviousDealerCardsDealt(prevCards);
-                let deck = [...cardsInDeck];
+                let deck = { ...cardsInDeck };
                 let cards = [...prevCards];
-                let cardDealt = [
-                  deck[Math.floor(Math.random() * deck.length)],
-                  false,
-                ];
-                for (let i = 0; i < deck.length; i++) {
-                  if (cardDealt[0] === deck[i]) {
+                let keys = Object.keys(deck);
+                let random = Math.floor(Math.random() * keys.length);
+                let cardDealt = [keys[random], deck[keys[random]], false];
+                for (let i = 0; i < keys.length; i++) {
+                  if (cardDealt[0] === keys[i]) {
                     console.log("card found");
-                    deck.splice(i, 1);
+                    delete deck[keys[i]];
                   }
                 }
                 cards.push(cardDealt);
@@ -422,16 +454,16 @@ const Main = () => {
             if (playerCardsDealt.length < 6) {
               setPlayerCardsDealt((prevCards) => {
                 setPreviousPlayerCardsDealt(prevCards);
-                let deck = [...cardsInDeck];
+                let deck = { ...cardsInDeck };
                 let cards = [...prevCards];
-                let cardDealt = [
-                  deck[Math.floor(Math.random() * deck.length)],
-                  false,
-                ];
-                for (let i = 0; i < deck.length; i++) {
-                  if (cardDealt[0] === deck[i]) {
+                let keys = Object.keys(deck);
+                let random = Math.floor(Math.random() * keys.length);
+                let cardDealt = [keys[random], deck[keys[random]], false];
+                for (let i = 0; i < keys.length; i++) {
+                  if (cardDealt[0] === keys[i]) {
                     console.log("card found");
-                    deck.splice(i, 1);
+
+                    delete deck[keys[i]];
                   }
                 }
                 cards.push(cardDealt);
