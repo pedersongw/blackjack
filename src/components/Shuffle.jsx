@@ -192,6 +192,12 @@ const Shuffle = (props) => {
             to: {
               transform: `perspective(600px) rotateX(180deg)`,
             },
+            config: {
+              mass: 17.3,
+              tension: 86,
+              friction: 113,
+              clamp: true,
+            },
           });
           api.current[thisCard].start({
             xy: [
@@ -199,7 +205,9 @@ const Shuffle = (props) => {
               props[`${determineSpringProps}CardSlots`][startingIndex + i].y,
             ],
             config: {
-              friction: 30,
+              mass: 17.3,
+              tension: 86,
+              friction: 113,
               clamp: true,
             },
             onRest: () => {
