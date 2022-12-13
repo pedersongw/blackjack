@@ -55,18 +55,10 @@ const Shuffle = (props) => {
                 props.setShuffling(["in", false]);
                 console.log("last card", props.hk);
               },
-              config: {
-                friction: 30,
-                clamp: true,
-              },
             });
           } else {
             api.current[i].start({
               xy: [props.hk[0], props.hk[1]],
-
-              config: {
-                friction: 30,
-              },
             });
           }
         }, Math.pow(i, 2));
@@ -82,12 +74,10 @@ const Shuffle = (props) => {
                   props.changeBackground();
                 }, 350);
               },
-              config: { friction: 100 },
             });
           } else {
             api.current[i].start({
               xy: [coords[i][0], coords[i][1]],
-              config: { friction: 100 },
             });
           }
         }, Math.pow(51 - i, 2));
@@ -193,9 +183,9 @@ const Shuffle = (props) => {
               transform: `perspective(600px) rotateX(180deg)`,
             },
             config: {
-              mass: 17.3,
-              tension: 86,
-              friction: 113,
+              mass: 7.8,
+              tension: 307,
+              friction: 85,
               clamp: true,
             },
           });
@@ -205,9 +195,9 @@ const Shuffle = (props) => {
               props[`${determineSpringProps}CardSlots`][startingIndex + i].y,
             ],
             config: {
-              mass: 17.3,
-              tension: 86,
-              friction: 113,
+              mass: 7.8,
+              tension: 307,
+              friction: 85,
               clamp: true,
             },
             onRest: () => {
