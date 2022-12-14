@@ -137,6 +137,7 @@ const Shuffle = (props) => {
       }
 
       setCoords(coords);
+      console.log("hk", [h, k]);
     }
   }, [props.rect]);
 
@@ -183,8 +184,8 @@ const Shuffle = (props) => {
               transform: `perspective(600px) rotateX(180deg)`,
             },
             config: {
-              mass: 7.8,
-              tension: 407,
+              mass: 3.8,
+              tension: 347,
               friction: 85,
               clamp: true,
             },
@@ -195,8 +196,8 @@ const Shuffle = (props) => {
               props[`${determineSpringProps}CardSlots`][startingIndex + i].y,
             ],
             config: {
-              mass: 7.8,
-              tension: 407,
+              mass: 3.8,
+              tension: 347,
               friction: 85,
               clamp: true,
             },

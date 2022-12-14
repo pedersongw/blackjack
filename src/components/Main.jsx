@@ -104,8 +104,6 @@ const Main = () => {
   const [hk, setHk] = useState([0, 0]);
   const [whereShuffle, setWhereShuffle] = useState({});
 
-  const wrapperRef = useRef();
-
   const dealerHandRef = useRef();
   const playerHandRef = useRef();
   const shuffleRef = useRef();
@@ -372,11 +370,12 @@ const Main = () => {
     console.log(dealerScore, playerScore);
   }, [dealerScore, playerScore]);
 
+  useEffect(() => {}, [windowSize]);
+
   return (
     <div
       className={styles.wrapper}
-      ref={wrapperRef}
-      style={{ height: `${windowSize[1]}px` }}
+      style={{ height: `${window.innerHeight}px` }}
     >
       <div className={styles.handWrapper} ref={dealerHandRef}>
         <Hand
