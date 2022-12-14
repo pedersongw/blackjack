@@ -105,7 +105,8 @@ const Shuffle = (props) => {
     if (props.rect.height && props.cardSize) {
       let h = Math.floor(props.rect.width / 2 - props.cardSize[0] / 2);
       let k = Math.floor(
-        props.rect.height * 0.1 + (window.innerHeight / 3) * 2
+        (props.rect.height - props.cardSize[1]) / 2 +
+          (window.innerHeight / 3) * 2
       );
 
       props.setHk([h, k]);
