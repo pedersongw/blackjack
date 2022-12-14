@@ -210,6 +210,7 @@ const Main = () => {
 
   function handleResize() {
     setWindowSize([window.innerWidth, window.innerHeight]);
+
     let shuffleRect = shuffleRef.current.getBoundingClientRect();
 
     calculateCardSize();
@@ -372,7 +373,11 @@ const Main = () => {
   }, [dealerScore, playerScore]);
 
   return (
-    <div className={styles.wrapper} ref={wrapperRef}>
+    <div
+      className={styles.wrapper}
+      ref={wrapperRef}
+      style={{ height: `${windowSize[1]}px` }}
+    >
       <div className={styles.handWrapper} ref={dealerHandRef}>
         <Hand
           cards={dealerCardsDealt}
