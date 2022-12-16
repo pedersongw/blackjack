@@ -81,21 +81,17 @@ const Main = () => {
   const [cardSize, setCardSize] = useState([0, 0]);
   const [whereDealerHand, setWhereDealerHand] = useState(null);
   const [wherePlayerHand, setWherePlayerHand] = useState(null);
+  const [whereDealerCardSlots, setWhereDealerCardSlots] = useState(null);
+  const [wherePlayerCardSlots, setWherePlayerCardSlots] = useState(null);
 
   const [dealerScore, setDealerScore] = useState([0]);
   const [playerScore, setPlayerScore] = useState([0]);
 
   const [dealerCardsDealt, setDealerCardsDealt] = useState([]);
   const [previousDealerCardsDealt, setPreviousDealerCardsDealt] = useState([]);
-  const [whereDealerCardSlots, setWhereDealerCardSlots] = useState(null);
 
   const [playerCardsDealt, setPlayerCardsDealt] = useState([]);
   const [previousPlayerCardsDealt, setPreviousPlayerCardsDealt] = useState([]);
-  const [wherePlayerCardSlots, setWherePlayerCardSlots] = useState(null);
-
-  const [testRect, setTestRect] = useState(null);
-
-  const [isTestCardVisiblie, setIsTestCardVisible] = useState(false);
 
   const [shuffling, setShuffling] = useState(["in", true]);
   const [dealerFlipping, setDealerFlipping] = useState(false);
@@ -196,7 +192,7 @@ const Main = () => {
     let availableHandWidth = dealerHandRect.width * 0.9;
     let cardHeight;
     let cardWidth = (availableHandWidth / 8) * 3;
-    console.log(cardWidth);
+
     if ((cardWidth / 234) * 333 > availableHandHeight) {
       cardHeight = availableHandHeight;
       cardWidth = (cardHeight / 333) * 234;
@@ -214,7 +210,6 @@ const Main = () => {
     calculateCardSize();
 
     setWhereShuffle(shuffleRect);
-    console.log("resizing");
   }
 
   const resetDeck = () => {
@@ -362,15 +357,104 @@ const Main = () => {
     }
   }, [playerCardsDealt, dealerCardsDealt]);
 
-  useEffect(() => {
-    console.log(cardsInDeck);
-  }, [cardsInDeck]);
-
-  useEffect(() => {
-    console.log(dealerScore, playerScore);
-  }, [dealerScore, playerScore]);
-
   useEffect(() => {}, [windowSize]);
+
+  const initialDeal = () => {
+    let deck = { ...cardsInDeck };
+    let keys = Object.keys(deck);
+
+    let cards = Array(4);
+    for (let i = 0; i < 4; i++) {
+      let random = Math.floor(Math.random() * keys.length);
+      while (cards.includes(random)) {
+        random = Math.floor(Math.random() * keys.length);
+      }
+
+      cards[i] = random;
+    }
+    cards = cards.map((e) => {
+      return [keys[e], deck[keys[e]], false];
+    });
+    for (let i = 0; i < cards.length; i++) {
+      delete deck[cards[i][0]];
+    }
+    for (let i = 0; i < 4; i++) {
+      setTimeout(() => {
+        if (i < 2) {
+          setPlayerCardsDealt((prevCards) => {
+            setPreviousPlayerCardsDealt(prevCards);
+            let newCards = [...prevCards];
+            newCards.push(cards[i]);
+            return newCards;
+          });
+        } else {
+          setDealerCardsDealt((prevCards) => {
+            setPreviousDealerCardsDealt(prevCards);
+            let newCards = [...prevCards];
+            newCards.push(cards[i]);
+            return newCards;
+          });
+        }
+      }, i * 500);
+    }
+    setCardsInDeck(deck);
+  };
+
+  const dealPlayerCard = (who) => {
+    if (playerCardsDealt.length < 6) {
+      setPlayerCardsDealt((prevCards) => {
+        setPreviousPlayerCardsDealt(prevCards);
+        let deck = { ...cardsInDeck };
+        let keys = Object.keys(deck);
+        let random = Math.floor(Math.random() * keys.length);
+        let cardDealt = [keys[random], deck[keys[random]], false];
+        for (let i = 0; i < keys.length; i++) {
+          if (cardDealt[0] === keys[i]) {
+            delete deck[keys[i]];
+          }
+        }
+        setCardsInDeck(deck);
+
+        let cards = [...prevCards];
+        cards.push(cardDealt);
+        return cards;
+      });
+    }
+  };
+
+  const dealDealerCard = () => {
+    if (dealerCardsDealt.length < 6) {
+      setDealerCardsDealt((prevCards) => {
+        setPreviousDealerCardsDealt(prevCards);
+        let deck = { ...cardsInDeck };
+        let cards = [...prevCards];
+        let keys = Object.keys(deck);
+        let random = Math.floor(Math.random() * keys.length);
+        let cardDealt = [keys[random], deck[keys[random]], false];
+        for (let i = 0; i < keys.length; i++) {
+          if (cardDealt[0] === keys[i]) {
+            delete deck[keys[i]];
+          }
+        }
+        // let secondRandom = Math.floor(Math.random() * keys.length);
+        // let secondCardDealt = [
+        //   keys[secondRandom],
+        //   deck[keys[secondRandom]],
+        //   false,
+        // ];
+        // for (let i = 0; i < keys.length; i++) {
+        //   if (secondCardDealt[0] === keys[i]) {
+        //
+        //     delete deck[keys[i]];
+        //   }
+        // }
+        // cards.push(cardDealt, secondCardDealt);
+        cards.push(cardDealt);
+        setCardsInDeck(deck);
+        return cards;
+      });
+    }
+  };
 
   return (
     <div
@@ -429,55 +513,10 @@ const Main = () => {
         <button
           className={styles.button}
           onClick={() => {
-            if (dealerCardsDealt.length < 6) {
-              setDealerCardsDealt((prevCards) => {
-                setPreviousDealerCardsDealt(prevCards);
-                let deck = { ...cardsInDeck };
-                let cards = [...prevCards];
-                let keys = Object.keys(deck);
-                let random = Math.floor(Math.random() * keys.length);
-                let cardDealt = [keys[random], deck[keys[random]], false];
-                for (let i = 0; i < keys.length; i++) {
-                  if (cardDealt[0] === keys[i]) {
-                    console.log("card found");
-                    delete deck[keys[i]];
-                  }
-                }
-                cards.push(cardDealt);
-                setCardsInDeck(deck);
-                return cards;
-              });
-            }
+            initialDeal();
           }}
         >
-          add dealer card
-        </button>
-        <button
-          className={styles.button}
-          onClick={() => {
-            if (playerCardsDealt.length < 6) {
-              setPlayerCardsDealt((prevCards) => {
-                setPreviousPlayerCardsDealt(prevCards);
-                let deck = { ...cardsInDeck };
-                let cards = [...prevCards];
-                let keys = Object.keys(deck);
-                let random = Math.floor(Math.random() * keys.length);
-                let cardDealt = [keys[random], deck[keys[random]], false];
-                for (let i = 0; i < keys.length; i++) {
-                  if (cardDealt[0] === keys[i]) {
-                    console.log("card found");
-
-                    delete deck[keys[i]];
-                  }
-                }
-                cards.push(cardDealt);
-                setCardsInDeck(deck);
-                return cards;
-              });
-            }
-          }}
-        >
-          add player card
+          initial Deal
         </button>
 
         <Shuffle

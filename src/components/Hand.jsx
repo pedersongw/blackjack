@@ -29,7 +29,6 @@ const Hand = (props) => {
   }));
 
   const setSlots = () => {
-    console.log("settingSlots");
     let slots = [
       firstRef.current.getBoundingClientRect(),
       secondRef.current.getBoundingClientRect(),
@@ -39,7 +38,6 @@ const Hand = (props) => {
       sixthRef.current.getBoundingClientRect(),
     ];
     props.setSlots(slots);
-    console.log(slots);
   };
 
   useEffect(() => {
@@ -91,7 +89,14 @@ const Hand = (props) => {
               : "0px",
           }}
         >
-          <p style={{ position: "absolute", top: 0, left: 0 }}>
+          <p
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              backgroundColor: props.score[0] > 21 ? "red" : null,
+            }}
+          >
             {props.score[0]}
           </p>
           <p style={{ position: "absolute", top: 0, right: 0 }}>

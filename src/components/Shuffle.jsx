@@ -53,7 +53,6 @@ const Shuffle = (props) => {
               xy: [props.hk[0], props.hk[1]],
               onStart: () => {
                 props.setShuffling(["in", false]);
-                console.log("last card", props.hk);
               },
             });
           } else {
@@ -138,12 +137,12 @@ const Shuffle = (props) => {
       }
 
       setCoords(coords);
-      console.log("hk", [h, k]);
     }
   }, [props.rect]);
 
   const dealCard = (arg) => {
-    console.log(props);
+    console.log(arg);
+
     let cards;
     let previousCards;
     let determineSpringProps;
@@ -157,13 +156,14 @@ const Shuffle = (props) => {
       determineSpringProps = "player";
     }
 
-    console.log(arg, cards, previousCards, determineSpringProps);
     if (cards.length !== previousCards.length) {
       let difference = cards.length - previousCards.length;
       let startingIndex = cards.length - difference;
       let newCards = cards.slice(-Math.abs(difference));
       for (let i = 0; i < newCards.length; i++) {
-        let thisCard = lastCardMoved - 1;
+        let thisCard = lastCardMoved - i - 1;
+        setLastCardMoved(thisCard);
+
         setFaces((prevFaces) => {
           let faces = [...prevFaces];
           faces[thisCard] =
@@ -173,7 +173,6 @@ const Shuffle = (props) => {
           return faces;
         });
         setTimeout(() => {
-          setLastCardMoved(thisCard);
           setZIndexes((prevIndexes) => {
             let indexes = [...prevIndexes];
             indexes[thisCard] = 51 - thisCard;
@@ -233,7 +232,7 @@ const Shuffle = (props) => {
               });
             },
           });
-        }, i * 100 + 300);
+        }, i * 500 + 350);
       }
     }
   };
@@ -280,10 +279,10 @@ const Shuffle = (props) => {
           >
             <animated.img
               src={faces ? faces[index] : null}
-              onLoad={() => console.log(`loaded${index}`)}
               style={{
                 ...flipSprings[index],
                 rotateX: "180deg",
+                borderRadius: "3px",
               }}
               className={styles.cardFace}
             ></animated.img>
@@ -292,6 +291,7 @@ const Shuffle = (props) => {
               style={{
                 ...flipSprings[index],
                 WebkitBackfaceVisibility: "hidden",
+                borderRadius: "3px",
               }}
               className={styles.cardFace}
             ></animated.img>
