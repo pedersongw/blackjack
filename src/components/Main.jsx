@@ -348,10 +348,10 @@ const Main = () => {
 
   useEffect(() => {
     computeScore("player");
-  }, [playerCardsDealt]);
+  }, [playerCardsDealt.length]);
   useEffect(() => {
     computeScore("dealer");
-  }, [dealerCardsDealt]);
+  }, [dealerCardsDealt.length]);
 
   const initialDeal = () => {
     let deck = { ...cardsInDeck };
@@ -454,7 +454,18 @@ const Main = () => {
   }, [playerScore]);
 
   useEffect(() => {
-    console.log(dealerScore);
+    console.log("change in dealer score", dealerScore);
+    if (initialDealComplete) {
+      if (dealerScore[1] && dealerScore[1] > 16) {
+        return;
+      } else if (dealerScore[0] > 16) {
+        return;
+      } else {
+        setTimeout(() => {
+          dealDealerCard();
+        }, 2000);
+      }
+    }
   }, [dealerScore]);
 
   return (
