@@ -456,7 +456,11 @@ const Main = () => {
   useEffect(() => {
     console.log("change in dealer score", dealerScore);
     if (initialDealComplete) {
-      if (dealerScore[1] && dealerScore[1] > 16) {
+      if (dealerScore[1] > 21 && dealerScore[0] < 17) {
+        setTimeout(() => {
+          dealDealerCard();
+        }, 2000);
+      } else if (dealerScore[1] && dealerScore[1] > 16) {
         return;
       } else if (dealerScore[0] > 16) {
         return;
