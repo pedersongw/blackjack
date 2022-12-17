@@ -225,7 +225,9 @@ const Shuffle = (props) => {
                   return cards;
                 });
               }
-
+              if (thisCard === 48 && props.initialDealStarted) {
+                props.setInitialDealComplete(true);
+              }
               api.current[thisCard].start({
                 xy: [coords[thisCard][0], coords[thisCard][1]],
                 immediate: true,

@@ -84,8 +84,12 @@ const Main = () => {
   const [whereDealerCardSlots, setWhereDealerCardSlots] = useState(null);
   const [wherePlayerCardSlots, setWherePlayerCardSlots] = useState(null);
 
+  const [initialDealStarted, setInitialDealStarted] = useState(false);
+  const [initialDealComplete, setInitialDealComplete] = useState(false);
   const [dealerScore, setDealerScore] = useState([0]);
   const [playerScore, setPlayerScore] = useState([0]);
+
+  const [playerHold, setPlayerHold] = useState(false);
 
   const [dealerCardsDealt, setDealerCardsDealt] = useState([]);
   const [previousDealerCardsDealt, setPreviousDealerCardsDealt] = useState([]);
@@ -293,71 +297,61 @@ const Main = () => {
     },
   }));
 
-  useEffect(() => {
-    let dealerCodes = [];
-    let playerCodes = [];
-    let dealerAces = 0;
-    let playerAces = 0;
-    let dealerTwoPossibleScores = [];
-    let playerTwoPossibleScores = [];
-    for (let i = 0; i < playerCardsDealt.length; i++) {
-      let arr = playerCardsDealt[i][0].split("");
+  const computeScore = (who) => {
+    let codes = [];
+    let aces = 0;
+    let twoPossibleScores = [];
+    let cardsDealt;
+
+    if (who === "player") {
+      cardsDealt = [...playerCardsDealt];
+    } else {
+      cardsDealt = [...dealerCardsDealt];
+    }
+
+    for (let i = 0; i < cardsDealt.length; i++) {
+      let arr = cardsDealt[i][0].split("");
       arr.shift();
       let code = arr.join("");
       if (code === "J" || code === "Q" || code === "K") {
         code = 10;
       } else if (code === "A") {
-        playerAces++;
+        aces++;
         code = 1;
       } else {
         code = Number(code);
       }
-      playerCodes.push(code);
+      codes.push(code);
     }
-    for (let i = 0; i < dealerCardsDealt.length; i++) {
-      let arr = dealerCardsDealt[i][0].split("");
-      arr.shift();
-      let code = arr.join("");
-      if (code === "J" || code === "Q" || code === "K") {
-        code = 10;
-      } else if (code === "A") {
-        dealerAces++;
-        code = 1;
-      } else {
-        code = Number(code);
-      }
-      dealerCodes.push(code);
-    }
-    let reducedDealerLowerScore = dealerCodes.reduce(function (acc, current) {
+
+    let reducedLowerScore = codes.reduce(function (acc, current) {
       return acc + current;
     }, 0);
 
-    let reducedPlayerLowerScore = playerCodes.reduce(function (acc, current) {
-      return acc + current;
-    }, 0);
+    twoPossibleScores.push(reducedLowerScore);
 
-    dealerTwoPossibleScores.push(reducedDealerLowerScore);
-    playerTwoPossibleScores.push(reducedPlayerLowerScore);
-
-    if (dealerAces > 0) {
-      dealerTwoPossibleScores.push(reducedDealerLowerScore + 10);
+    if (aces > 0) {
+      twoPossibleScores.push(reducedLowerScore + 10);
     }
-
-    if (playerAces > 0) {
-      playerTwoPossibleScores.push(reducedPlayerLowerScore + 10);
+    if (who === "player") {
+      setPlayerScore(twoPossibleScores);
+    } else {
+      setDealerScore(twoPossibleScores);
     }
-
-    setDealerScore(dealerTwoPossibleScores);
-    setPlayerScore(playerTwoPossibleScores);
 
     if (!dealerCardsDealt[0] && !playerCardsDealt[0]) {
       resetDeck();
       setPlayerScore([0]);
       setDealerScore([0]);
     }
-  }, [playerCardsDealt, dealerCardsDealt]);
+  };
 
-  useEffect(() => {}, [windowSize]);
+  useEffect(() => {
+    computeScore("player");
+  }, [playerCardsDealt]);
+  useEffect(() => {
+    computeScore("dealer");
+  }, [dealerCardsDealt]);
 
   const initialDeal = () => {
     let deck = { ...cardsInDeck };
@@ -398,9 +392,10 @@ const Main = () => {
       }, i * 500);
     }
     setCardsInDeck(deck);
+    setInitialDealStarted(true);
   };
 
-  const dealPlayerCard = (who) => {
+  const dealPlayerCard = () => {
     if (playerCardsDealt.length < 6) {
       setPlayerCardsDealt((prevCards) => {
         setPreviousPlayerCardsDealt(prevCards);
@@ -436,25 +431,31 @@ const Main = () => {
             delete deck[keys[i]];
           }
         }
-        // let secondRandom = Math.floor(Math.random() * keys.length);
-        // let secondCardDealt = [
-        //   keys[secondRandom],
-        //   deck[keys[secondRandom]],
-        //   false,
-        // ];
-        // for (let i = 0; i < keys.length; i++) {
-        //   if (secondCardDealt[0] === keys[i]) {
-        //
-        //     delete deck[keys[i]];
-        //   }
-        // }
-        // cards.push(cardDealt, secondCardDealt);
+
         cards.push(cardDealt);
         setCardsInDeck(deck);
         return cards;
       });
     }
   };
+
+  useEffect(() => {
+    if (playerHold && initialDealComplete && dealerScore[0] < 17) {
+      setTimeout(() => {
+        dealDealerCard();
+      }, 1000);
+    }
+  }, [playerHold]);
+
+  useEffect(() => {
+    if (playerScore[0] > 21) {
+      setPlayerHold(true);
+    }
+  }, [playerScore]);
+
+  useEffect(() => {
+    console.log(dealerScore);
+  }, [dealerScore]);
 
   return (
     <div
@@ -493,7 +494,7 @@ const Main = () => {
         />
       </div>
       <div className={styles.shuffleWrapper} ref={shuffleRef}>
-        <button
+        {/* <button
           onClick={() => setShuffling(["out", true])}
           className={styles.button}
           disabled={shuffling[1]}
@@ -509,15 +510,42 @@ const Main = () => {
           }}
         >
           flip
-        </button>
-        <button
-          className={styles.button}
-          onClick={() => {
-            initialDeal();
-          }}
-        >
-          initial Deal
-        </button>
+        </button> */}
+        {!initialDealComplete && (
+          <button
+            className={styles.button}
+            disabled={initialDealStarted}
+            onClick={() => {
+              initialDeal();
+            }}
+          >
+            initial Deal
+          </button>
+        )}
+        {initialDealComplete && !playerHold && (
+          <React.Fragment>
+            <button
+              className={styles.button}
+              disabled={playerScore[0] >= 21}
+              onClick={() => {
+                console.log("hit");
+                dealPlayerCard();
+              }}
+            >
+              hit
+            </button>
+            <button
+              className={styles.button}
+              disabled={playerHold}
+              onClick={() => {
+                console.log("hold");
+                setPlayerHold(true);
+              }}
+            >
+              hold
+            </button>
+          </React.Fragment>
+        )}
 
         <Shuffle
           rect={whereShuffle}
@@ -537,6 +565,8 @@ const Main = () => {
           changeBackground={changeBackground}
           shuffling={shuffling}
           setShuffling={setShuffling}
+          initialDealStarted={initialDealStarted}
+          setInitialDealComplete={setInitialDealComplete}
         />
       </div>
     </div>

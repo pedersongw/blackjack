@@ -72,7 +72,7 @@ const Hand = (props) => {
         style={{
           ...spring,
 
-          backgroundColor: "lightgreen",
+          backgroundColor: "#a2f8de",
           backfaceVisibility: "hidden",
         }}
       >
@@ -141,7 +141,7 @@ const Hand = (props) => {
         style={{
           ...spring,
           rotateX: "180deg",
-          backgroundColor: "lightgreen",
+          backgroundColor: "#a2f8de",
           backfaceVisibility: "hidden",
         }}
       ></animated.div>
