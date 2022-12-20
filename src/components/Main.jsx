@@ -441,9 +441,7 @@ const Main = () => {
 
   useEffect(() => {
     if (playerHold && initialDealComplete) {
-      setTimeout(() => {
-        determineIfDealerShouldDraw();
-      }, 1000);
+      determineIfDealerShouldDraw();
     }
   }, [playerHold]);
 
