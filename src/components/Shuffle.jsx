@@ -141,8 +141,6 @@ const Shuffle = (props) => {
   }, [props.rect]);
 
   const dealCard = (arg) => {
-    console.log(arg);
-
     let cards;
     let previousCards;
     let determineSpringProps;

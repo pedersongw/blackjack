@@ -440,9 +440,9 @@ const Main = () => {
   };
 
   useEffect(() => {
-    if (playerHold && initialDealComplete && dealerScore[0] < 17) {
+    if (playerHold && initialDealComplete) {
       setTimeout(() => {
-        dealDealerCard();
+        determineIfDealerShouldDraw();
       }, 1000);
     }
   }, [playerHold]);
@@ -453,23 +453,47 @@ const Main = () => {
     }
   }, [playerScore]);
 
-  useEffect(() => {
-    console.log("change in dealer score", dealerScore);
+  const determineIfDealerShouldDraw = () => {
     if (initialDealComplete) {
-      if (dealerScore[1] > 21 && dealerScore[0] < 17) {
-        setTimeout(() => {
-          dealDealerCard();
-        }, 2000);
-      } else if (dealerScore[1] && dealerScore[1] > 16) {
-        return;
-      } else if (dealerScore[0] > 16) {
-        return;
+      if (dealerScore[1]) {
+        console.log(dealerScore[1]);
+        if (dealerScore[1] === 21) {
+          console.log("dont'draw", 1);
+          return;
+        } else if (dealerScore[1] > 17 && dealerScore[1] < 21) {
+          console.log("dont'draw", 2);
+          return;
+        } else if (
+          (dealerScore[1] > 21 && dealerScore[0] < 17) ||
+          dealerScore[1] < 17
+        ) {
+          setTimeout(() => {
+            console.log("draw", 3);
+            dealDealerCard();
+          }, 2000);
+        } else {
+          console.log("dont'draw", 4);
+          return;
+        }
       } else {
-        setTimeout(() => {
-          dealDealerCard();
-        }, 2000);
+        if (dealerScore[0] === 21) {
+          console.log("dont'draw", 5);
+          return;
+        } else if (dealerScore[0] < 17) {
+          setTimeout(() => {
+            console.log("draw", 6);
+            dealDealerCard();
+          }, 2000);
+        } else {
+          console.log("dont'draw", 7);
+          return;
+        }
       }
     }
+  };
+
+  useEffect(() => {
+    determineIfDealerShouldDraw();
   }, [dealerScore]);
 
   return (

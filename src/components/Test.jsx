@@ -1,34 +1,52 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 
 const Test = () => {
-  // const [counter, setCounter] = useState(1);
+  const [score, setScore] = useState([0]);
 
-  // const previousValue = useRef(null);
-
-  // useEffect(() => {
-  //   previousValue.current = counter;
-  //   console.log(counter);
-  // }, [counter]);
-
-  const [arr, setArr] = useState([1, 2, 3]);
-
+  const testFunc = () => {
+    if (score[1]) {
+      if (score[1] === 21) {
+        console.log("don't draw");
+      } else if (score[1] > 17 && score[1] < 21) {
+        console.log("don't draw");
+      } else if ((score[1] > 21 && score[0] < 17) || score[1] < 17) {
+        console.log("draw");
+      } else {
+        console.log("don't draw");
+      }
+    } else {
+      if (score[0] === 21) {
+        console.log("don't draw");
+      } else if (score[0] < 17) {
+        console.log("draw");
+      } else {
+        console.log("don't draw");
+      }
+    }
+  };
   return (
     <div>
-      {/* {counter} {previousValue.current} */}
-      {/* <button onClick={() => setCounter(counter + 1)}>button</button>
-       */}
-      <button onClick={() => console.log(arr, arr.length)}>log arr</button>
-      <button
-        onClick={() =>
-          setArr((prevArr) => {
-            let arr = [...prevArr];
-            arr[arr.length + 5] = true;
-            return arr;
-          })
-        }
-      >
-        add item
-      </button>
+      <label>
+        [0]
+        <input
+          onChange={(e) => {
+            let arr = [...score];
+            arr[0] = Number(e.target.value);
+            setScore(arr);
+          }}
+        ></input>
+      </label>
+      <label>
+        [1]
+        <input
+          onChange={(e) => {
+            let arr = [...score];
+            arr[1] = Number(e.target.value);
+            setScore(arr);
+          }}
+        ></input>
+        <button onClick={() => testFunc()}>button</button>
+      </label>
     </div>
   );
 };
