@@ -90,6 +90,7 @@ const Main = () => {
   const [playerScore, setPlayerScore] = useState([0]);
 
   const [playerHold, setPlayerHold] = useState(false);
+  const [dealerHold, setDealerHold] = useState(false);
 
   const [dealerCardsDealt, setDealerCardsDealt] = useState([]);
   const [previousDealerCardsDealt, setPreviousDealerCardsDealt] = useState([]);
@@ -446,6 +447,12 @@ const Main = () => {
   }, [playerHold]);
 
   useEffect(() => {
+    if (dealerHold) {
+      console.log("dealer hold");
+    }
+  }, [dealerHold]);
+
+  useEffect(() => {
     if (playerScore[0] > 21) {
       setPlayerHold(true);
     }
@@ -456,34 +463,32 @@ const Main = () => {
       if (dealerScore[1]) {
         console.log(dealerScore[1]);
         if (dealerScore[1] === 21) {
-          console.log("dont'draw", 1);
+          setDealerHold(true);
           return;
         } else if (dealerScore[1] > 17 && dealerScore[1] < 21) {
-          console.log("dont'draw", 2);
+          setDealerHold(true);
           return;
         } else if (
           (dealerScore[1] > 21 && dealerScore[0] < 17) ||
           dealerScore[1] < 17
         ) {
           setTimeout(() => {
-            console.log("draw", 3);
             dealDealerCard();
-          }, 2000);
+          }, 1000);
         } else {
-          console.log("dont'draw", 4);
+          setDealerHold(true);
           return;
         }
       } else {
         if (dealerScore[0] === 21) {
-          console.log("dont'draw", 5);
+          setDealerHold(true);
           return;
         } else if (dealerScore[0] < 17) {
           setTimeout(() => {
-            console.log("draw", 6);
             dealDealerCard();
-          }, 2000);
+          }, 1000);
         } else {
-          console.log("dont'draw", 7);
+          setDealerHold(true);
           return;
         }
       }
@@ -575,7 +580,7 @@ const Main = () => {
               className={styles.button}
               disabled={playerHold}
               onClick={() => {
-                console.log("hold");
+                console.log("player hold");
                 setPlayerHold(true);
               }}
             >
@@ -583,7 +588,22 @@ const Main = () => {
             </button>
           </React.Fragment>
         )}
-
+        {dealerHold && (
+          <button
+            className={styles.button}
+            onClick={() => {
+              setInitialDealComplete(false);
+              setInitialDealStarted(false);
+              setDealerHold(false);
+              setPlayerHold(false);
+              setDealerFlipping(true);
+              setPlayerFlipping(true);
+              setTimeout(() => setShuffling(["out", true]), 1000);
+            }}
+          >
+            Flip and Shuffle
+          </button>
+        )}
         <Shuffle
           rect={whereShuffle}
           windowSize={windowSize}

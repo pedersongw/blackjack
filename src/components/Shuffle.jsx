@@ -229,6 +229,12 @@ const Shuffle = (props) => {
               api.current[thisCard].start({
                 xy: [coords[thisCard][0], coords[thisCard][1]],
                 immediate: true,
+                config: {
+                  mass: 1,
+                  tension: 170,
+                  friction: 26,
+                  clamp: false,
+                },
               });
             },
           });
